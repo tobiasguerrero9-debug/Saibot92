@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { BarChart2, TrendingUp, TrendingDown, Layers, Zap, Info } from 'lucide-react';
+import { BarChart2 } from 'lucide-react';
 import {
   ResponsiveContainer,
   ComposedChart,
   Area,
   Bar,
-  Line,
   XAxis,
   YAxis,
   Tooltip,
@@ -13,16 +12,16 @@ import {
 } from 'recharts';
 
 /**
- * Custom Rich Tooltip Component
+ * Custom Rich Light Tooltip Component
  */
-const CustomChartTooltip = ({ active, payload, label }) => {
+const CustomChartTooltip = ({ active, payload }) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     const isUp = data.close >= data.open;
     const priceChangePct = data.open ? (((data.close - data.open) / data.open) * 100).toFixed(2) : '0.00';
 
     return (
-      <div className="bg-white/95 backdrop-blur-md border border-purple-200/90 rounded-2xl p-4 shadow-xl text-xs font-mono space-y-2.5 min-w-[200px]">
+      <div className="bg-white/95 backdrop-blur-md border border-purple-200/90 rounded-2xl p-4 shadow-xl text-xs font-mono space-y-2.5 min-w-[200px] text-slate-900">
         <div className="flex items-center justify-between pb-2 border-b border-slate-100">
           <span className="text-slate-500 font-bold">{data.time}</span>
           <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${isUp ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>
@@ -69,7 +68,6 @@ export default function MainChartSection({ marketData, selectedTimeframe }) {
     );
   }
 
-  // Pre-process klines data to classify volume bars by candle direction
   const processedKlines = marketData.klines.map((k) => {
     const isUp = k.close >= k.open;
     return {
@@ -101,7 +99,7 @@ export default function MainChartSection({ marketData, selectedTimeframe }) {
               </span>
             </div>
             <p className="text-xs text-slate-500 font-medium mt-0.5">
-              Live Binance USD-M Futures OHLCV Telemetry
+              Live Binance USD-M Futures Telemetry
             </p>
           </div>
         </div>
@@ -165,13 +163,12 @@ export default function MainChartSection({ marketData, selectedTimeframe }) {
         </div>
       </div>
 
-      {/* Advanced Recharts Plotting Container */}
+      {/* Recharts Light Plotting Container */}
       <div className="h-[360px] w-full pt-2">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart data={processedKlines} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
             <defs>
-              {/* Soft purple gradient fill under price line */}
-              <linearGradient id="priceGradient" x1="0" y1="0" x2="0" y2="1">
+              <linearGradient id="priceGradientLight" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="#7c3aed" stopOpacity={0.22} />
                 <stop offset="100%" stopColor="#7c3aed" stopOpacity={0.0} />
               </linearGradient>
@@ -188,7 +185,6 @@ export default function MainChartSection({ marketData, selectedTimeframe }) {
               dy={5}
             />
 
-            {/* Left Y-Axis for Price */}
             {(chartMode === 'price-vol' || chartMode === 'price') && (
               <YAxis
                 yAxisId="priceAxis"
@@ -202,7 +198,6 @@ export default function MainChartSection({ marketData, selectedTimeframe }) {
               />
             )}
 
-            {/* Right Y-Axis for Volume */}
             {(chartMode === 'price-vol' || chartMode === 'vol') && (
               <YAxis
                 yAxisId="volumeAxis"
@@ -218,7 +213,6 @@ export default function MainChartSection({ marketData, selectedTimeframe }) {
 
             <Tooltip content={<CustomChartTooltip />} />
 
-            {/* Volume Bars (Bullish green vs Bearish red) */}
             {(chartMode === 'price-vol' || chartMode === 'vol') && (
               <Bar
                 yAxisId="volumeAxis"
@@ -242,7 +236,6 @@ export default function MainChartSection({ marketData, selectedTimeframe }) {
               />
             )}
 
-            {/* Soft Purple Gradient Area + Bold Price Line */}
             {(chartMode === 'price-vol' || chartMode === 'price') && (
               <Area
                 yAxisId="priceAxis"
@@ -250,7 +243,7 @@ export default function MainChartSection({ marketData, selectedTimeframe }) {
                 dataKey="close"
                 stroke="#7c3aed"
                 strokeWidth={3}
-                fill="url(#priceGradient)"
+                fill="url(#priceGradientLight)"
                 dot={false}
                 name="Close Price ($)"
               />

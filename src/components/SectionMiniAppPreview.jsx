@@ -23,7 +23,7 @@ const previewData = [
 
 export default function SectionMiniAppPreview() {
   return (
-    <section id="preview" className="py-24 bg-slate-50 border-t border-slate-200/60">
+    <section id="preview" className="py-24 bg-[#fcfcfd] border-t border-slate-200/70">
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 space-y-12">
         
         {/* Header */}
@@ -32,21 +32,21 @@ export default function SectionMiniAppPreview() {
             PRODUCT PREVIEW
           </span>
           <h2 className="text-4xl sm:text-6xl font-black text-slate-950 tracking-tight">
-            SAIBOT92 Mini App
+            SAIBOT92 Agent Mode
           </h2>
           <p className="text-lg text-slate-600 font-medium">
-            A clean, distilled interface engineered for fast market clarity.
+            A clean, distilled intelligence terminal engineered for fast market clarity.
           </p>
         </div>
 
-        {/* One Large Clean Product Preview Container */}
-        <div className="rounded-[36px] bg-white border border-slate-200 p-8 sm:p-14 shadow-xl space-y-8">
+        {/* Product Preview Container */}
+        <div className="rounded-[36px] bg-white border border-slate-200/80 p-8 sm:p-14 shadow-[0_4px_25px_rgba(0,0,0,0.03)] space-y-8">
           
           {/* Top Interface Bar */}
           <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-slate-100 font-mono">
             <div className="flex items-center gap-3">
               <span className="text-xl font-bold text-slate-950">BTC-PERP</span>
-              <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold">
+              <span className="px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold">
                 $67,842.11 (+2.34%)
               </span>
             </div>
@@ -58,10 +58,10 @@ export default function SectionMiniAppPreview() {
             </div>
           </div>
 
-          {/* Clean Chart View */}
+          {/* Light Chart View */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-bold text-slate-900">
+              <h3 className="text-lg font-bold text-slate-950">
                 Order Flow & Liquidations Context
               </h3>
               <div className="flex items-center space-x-6 text-xs font-mono">
@@ -77,7 +77,7 @@ export default function SectionMiniAppPreview() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
                   <XAxis dataKey="time" stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
                   <YAxis stroke="#94a3b8" fontSize={12} tickFormatter={(val) => `$${Math.abs(val)}M`} tickLine={false} axisLine={false} />
-                  <Tooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '12px', boxShadow: '0 10px 25px rgba(0,0,0,0.08)' }} />
+                  <Tooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#cbd5e1', borderRadius: '12px', color: '#0f172a' }} />
                   <Bar dataKey="longs" fill="#10b981" radius={[4, 4, 0, 0]} barSize={14} />
                   <Bar dataKey="shorts" fill="#f43f5e" radius={[0, 0, 4, 4]} barSize={14} />
                   <Line type="monotone" dataKey="price" stroke="#7c3aed" strokeWidth={3} dot={false} />
@@ -94,9 +94,9 @@ export default function SectionMiniAppPreview() {
 
             <Link 
               to="/app"
-              className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-[#7c3aed] hover:bg-[#6d28d9] text-white font-bold text-sm transition-all shadow-md flex items-center justify-center gap-2"
+              className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-[#7c3aed] hover:bg-[#6d28d9] text-white font-bold text-sm transition-all shadow-[0_4px_14px_rgba(124,58,237,0.3)] flex items-center justify-center gap-2"
             >
-              <span>Launch Mini App</span>
+              <span>Launch App</span>
               <ArrowUpRight className="w-4 h-4" />
             </Link>
           </div>

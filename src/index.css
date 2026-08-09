@@ -2,17 +2,80 @@
 
 @layer base {
   body {
-    background-color: #ffffff;
+    background-color: #fcfcfd;
     color: #0f172a;
     font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
   }
 }
 
+/* Custom Light Surfaces */
+.bg-light-base {
+  background-color: #fcfcfd;
+}
+
+.bg-light-surface {
+  background-color: #ffffff;
+}
+
+.bg-light-card {
+  background-color: #f8fafc;
+}
+
+.border-light-purple {
+  border-color: rgba(124, 58, 237, 0.15);
+}
+
+.border-light-purple-bright {
+  border-color: rgba(124, 58, 237, 0.35);
+}
+
+/* Glassmorphism Light Card */
+.glass-card-light {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(124, 58, 237, 0.15);
+}
+
+/* Glow Utilities */
+.purple-glow-light {
+  box-shadow: 0 4px 20px rgba(124, 58, 237, 0.08);
+}
+
+/* Animations */
 @keyframes float {
   0%, 100% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-16px) rotate(1deg); }
+  50% { transform: translateY(-12px) rotate(1deg); }
 }
 
 .animate-float {
   animation: float 6s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 3s ease-in-out infinite;
+}
+
+/* Custom Light Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f8fafc;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #7c3aed;
 }

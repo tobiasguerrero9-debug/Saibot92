@@ -8,7 +8,7 @@ export default function MarketScanner({ onSelectSymbol, activeSymbol }) {
   const [error, setError] = useState(null);
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterMode, setFilterMode] = useState('all'); // 'all' | 'featured'
+  const [filterMode, setFilterMode] = useState('all');
   const [sortField, setSortField] = useState('quoteVolume24h');
   const [sortAsc, setSortAsc] = useState(false);
 
@@ -212,7 +212,7 @@ export default function MarketScanner({ onSelectSymbol, activeSymbol }) {
                     </td>
 
                     <td className="py-3.5 px-4">
-                      <span className={`inline-flex items-center gap-1 font-bold px-2 py-0.5 rounded-md ${
+                      <span className={`inline-flex items-center gap-1 font-bold px-2 py-0.5 rounded ${
                         m.priceChange24h >= 0 ? 'text-emerald-700 bg-emerald-50' : 'text-rose-700 bg-rose-50'
                       }`}>
                         {m.priceChange24h >= 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}

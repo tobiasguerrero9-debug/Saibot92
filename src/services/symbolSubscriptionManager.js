@@ -1,13 +1,14 @@
 /**
  * symbolSubscriptionManager.js
  * Coordinates switching active trading symbols smoothly.
- * Prevents memory leaks, duplicate timers, or duplicate WebSocket connections.
+ * Integrates rolling 5-minute memory snapshot tracking via whatChangedTracker.
  */
 
 import { fetchTickers24h, fetchOpenInterest, fetchPremiumIndex, fetchKlines } from './binanceRestClient';
 import { normalizeSymbolData, normalizeWsMiniTicker, normalizeWsAggTrade, normalizeWsForceOrder } from './marketNormalizer';
 import { wsManager } from './binanceWebSocketManager';
 import { marketPollingService } from './marketPollingService';
+import { whatChangedTracker } from './whatChangedTracker';
 
 export class SymbolSubscriptionManager {
   constructor() {
@@ -15,7 +16,6 @@ export class SymbolSubscriptionManager {
     this.currentTimeframe = '15m';
     this.dataState = null;
     this.listeners = new Set();
-    this.statusListeners = new Set();
     this.connectionState = 'DISCONNECTED'; // CONNECTED | RECONNECTING | OFFLINE | LOADING
     this.staleTimer = null;
     this.isStale = false;
@@ -28,6 +28,9 @@ export class SymbolSubscriptionManager {
   }
 
   notifyState() {
+    if (this.dataState) {
+      whatChangedTracker.recordSnapshot(this.dataState);
+    }
     this.listeners.forEach((listener) => {
       listener(this.dataState, this.connectionState, this.isStale);
     });
@@ -39,16 +42,17 @@ export class SymbolSubscriptionManager {
     this.staleTimer = setTimeout(() => {
       this.isStale = true;
       this.notifyState();
-    }, 18000); // Mark stale if no updates in 18 seconds
+    }, 18000);
   }
 
-  /**
-   * Switch active symbol cleanly.
-   */
   async switchSymbol(symbol, timeframe = '15m') {
     const targetSymbol = symbol.toUpperCase();
 
-    // 1. Tear down previous symbol subscriptions & polling
+    // Reset history when switching to a brand new symbol so 5m comparison doesn't cross symbols
+    if (this.currentSymbol !== targetSymbol) {
+      whatChangedTracker.clearHistory(this.currentSymbol);
+    }
+
     this.unsubscribeCurrent();
 
     this.currentSymbol = targetSymbol;
@@ -58,7 +62,6 @@ export class SymbolSubscriptionManager {
     this.notifyState();
 
     try {
-      // 2. Initial REST Fetch for full snapshot
       const [ticker, openInterest, premiumIndex, klines] = await Promise.all([
         fetchTickers24h(targetSymbol),
         fetchOpenInterest(targetSymbol),
@@ -79,7 +82,7 @@ export class SymbolSubscriptionManager {
       this.resetStaleTimer();
       this.notifyState();
 
-      // 3. Start REST Polling
+      // Start REST Polling
       marketPollingService.startPolling(targetSymbol, timeframe, {
         onTickerUpdate: ({ ticker: newTicker, klines: newKlines }) => {
           if (this.dataState && newTicker) {
@@ -115,7 +118,7 @@ export class SymbolSubscriptionManager {
         },
       });
 
-      // 4. Start WebSocket Streams
+      // Start WebSocket Streams
       const streams = [
         `${targetSymbol.toLowerCase()}@miniTicker`,
         `${targetSymbol.toLowerCase()}@aggTrade`,
@@ -171,9 +174,6 @@ export class SymbolSubscriptionManager {
     }
   }
 
-  /**
-   * Cleanly stop subscriptions and timers.
-   */
   unsubscribeCurrent() {
     marketPollingService.stopPolling();
     wsManager.disconnect();
