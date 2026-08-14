@@ -16,7 +16,7 @@ import {
   Clock,
   Terminal,
   Activity,
-  History
+  Layers
 } from 'lucide-react';
 import { subscriptionManager } from '../services/symbolSubscriptionManager';
 import { analyzeMarketContext } from '../services/marketContextEngine';
@@ -26,6 +26,8 @@ import { analyzeOrderFlow } from '../services/orderFlowAnalyzer';
 import { FEATURED_SYMBOLS } from '../services/marketUniverseService';
 import MarketScanner from '../components/MarketScanner';
 import MainChartSection from '../components/MainChartSection';
+import WhatChangedBlock from '../components/WhatChangedBlock';
+import WebMarketSearch from '../components/WebMarketSearch';
 
 const TIMEFRAMES = ['5m', '15m', '1h'];
 
@@ -77,29 +79,29 @@ export default function MiniAppPage() {
   const analysis = analyzeMarketContext(marketData);
 
   return (
-    <div className="min-h-screen bg-[#fcfcfd] text-slate-900 font-sans selection:bg-purple-600 selection:text-white">
+    <div className="min-h-screen bg-[#fafafa] text-slate-900 font-sans selection:bg-purple-600 selection:text-white">
       
-      {/* 1. LIVE AGENT TELEMETRY HEADER */}
-      <header className="bg-white/90 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-40 shadow-[0_2px_15px_rgba(0,0,0,0.02)]">
+      {/* 1. APP HEADER */}
+      <header className="bg-white/90 backdrop-blur-md border-b border-purple-100 sticky top-0 z-40 shadow-[0_2px_15px_rgba(124,58,237,0.03)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4">
           
           {/* Logo & Navigation Back */}
           <div className="flex items-center gap-4">
             <button
               onClick={() => navigate('/')}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-purple-50 hover:bg-purple-100 text-[#7c3aed] text-xs font-bold transition-all border border-purple-200/60"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Landing Page</span>
             </button>
 
-            <div className="flex items-center gap-3 border-l border-slate-200/80 pl-4">
-              <div className="w-8 h-8 rounded-lg bg-purple-100 p-0.5 shadow-sm border border-purple-200">
-                <img src="/mascot_transparent.png" alt="SAIBOT92" className="w-full h-full object-contain" />
+            <div className="flex items-center gap-3 border-l border-purple-100 pl-4">
+              <div className="w-8 h-8 rounded-xl bg-[#7c3aed] p-1 shadow-sm flex items-center justify-center">
+                <img src="/mascot_transparent.png" alt="SAIBOT92" className="w-full h-full object-contain filter brightness-200" />
               </div>
               <div>
                 <span className="font-extrabold text-lg text-slate-950 tracking-tight flex items-center gap-1.5 font-mono">
-                  SAIBOT92 <span className="text-[#7c3aed]">/ AGENT CORE</span>
+                  SAIBOT92 <span className="text-[#7c3aed]">/ INTELLIGENCE LAYER</span>
                 </span>
                 <span className="text-[10px] font-mono text-slate-400 block -mt-1 uppercase tracking-wider">
                   BINANCE USD-M FUTURES TELEMETRY
@@ -115,7 +117,7 @@ export default function MiniAppPage() {
             {connectionState === 'CONNECTED' && !isStale && (
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold shadow-sm">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>LIVE</span>
+                <span>LIVE BINANCE</span>
               </span>
             )}
 
@@ -168,7 +170,7 @@ export default function MiniAppPage() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         
         {/* 2. CONTROL BAR */}
-        <div className="bg-white rounded-3xl p-5 border border-slate-200/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] space-y-4">
+        <div className="bg-white rounded-3xl p-5 border border-purple-100 shadow-[0_4px_20px_rgba(124,58,237,0.03)] space-y-4">
           
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             
@@ -182,7 +184,7 @@ export default function MiniAppPage() {
                   className={`px-3.5 py-1.5 rounded-xl text-xs font-bold font-mono transition-all flex items-center gap-1.5 ${
                     selectedSymbol === sym
                       ? 'bg-[#7c3aed] text-white shadow-md shadow-purple-200'
-                      : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                      : 'bg-purple-50/60 hover:bg-purple-100 text-slate-700 border border-purple-100'
                   }`}
                 >
                   <Star className={`w-3 h-3 ${selectedSymbol === sym ? 'fill-current text-white' : 'text-slate-400'}`} />
@@ -221,23 +223,11 @@ export default function MiniAppPage() {
           {activeTab === 'intelligence' && (
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-3 border-t border-slate-100">
               
-              {/* Quick Search */}
-              <form onSubmit={handleSearchSubmit} className="relative flex-1 max-w-sm">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  value={symbolSearchInput}
-                  onChange={(e) => setSymbolSearchInput(e.target.value)}
-                  placeholder="Switch symbol (e.g. AVAXUSDT, NEAR)..."
-                  className="w-full pl-9 pr-16 py-1.5 rounded-xl bg-slate-50 border border-slate-200/80 text-xs font-mono text-slate-900 focus:outline-none focus:border-[#7c3aed] focus:bg-white transition-all"
-                />
-                <button
-                  type="submit"
-                  className="absolute right-1.5 top-1/2 -translate-y-1/2 px-2.5 py-1 rounded-lg bg-purple-100 hover:bg-purple-200 text-[#7c3aed] font-mono text-[10px] font-bold transition-colors"
-                >
-                  GO
-                </button>
-              </form>
+              {/* Quick Search Autocomplete */}
+              <WebMarketSearch
+                activeSymbol={selectedSymbol}
+                onSelectSymbol={handleSymbolChange}
+              />
 
               {/* Timeframe Selector */}
               <div className="flex items-center gap-2 font-mono text-xs">
@@ -278,7 +268,7 @@ export default function MiniAppPage() {
           <>
             {/* Loading State */}
             {connectionState === 'LOADING' && !marketData && (
-              <div className="bg-white rounded-3xl p-16 text-center space-y-4 border border-slate-200/80 shadow-sm">
+              <div className="bg-white rounded-3xl p-16 text-center space-y-4 border border-purple-100 shadow-sm">
                 <RefreshCw className="w-8 h-8 text-[#7c3aed] animate-spin mx-auto" />
                 <h3 className="text-lg font-bold text-slate-950">Connecting to Binance USD-M Futures Stream...</h3>
                 <p className="text-xs text-slate-500 font-mono">Fetching public REST snapshot & subscribing to WebSockets for {selectedSymbol}</p>
@@ -304,115 +294,66 @@ export default function MiniAppPage() {
             {marketData && (
               <div className="space-y-8">
                 
-                {/* 3. AGENT STATE & WHAT CHANGED MODULES */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                {/* HERO MODULES GRID: AGENT STATE (Left) + WHAT CHANGED HERO (Right) */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                   
                   {/* AGENT STATE MODULE */}
-                  <div className="lg:col-span-7 bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] space-y-6">
-                    <div className="flex items-center justify-between border-b border-slate-100 pb-4 font-mono">
-                      <div className="flex items-center gap-2 text-[#7c3aed]">
-                        <Terminal className="w-4 h-4" />
-                        <span className="text-xs font-bold uppercase tracking-wider">AGENT STATE</span>
-                      </div>
-                      <span className="text-[11px] text-slate-400 font-mono">
-                        EVALUATED AT {marketData.lastUpdated}
-                      </span>
-                    </div>
-
-                    <div className="flex flex-wrap items-baseline justify-between gap-4">
-                      <div className="flex items-center gap-3">
-                        <span className="w-3.5 h-3.5 rounded-full bg-[#7c3aed] animate-pulse"></span>
-                        <h2 className="text-3xl sm:text-4xl font-mono font-black text-slate-950 tracking-tight">
-                          ● {agentStateInfo.state}
-                        </h2>
-                      </div>
-
-                      <div className="px-3.5 py-1.5 rounded-xl bg-purple-50 border border-purple-200 text-xs font-mono font-bold text-[#7c3aed]">
-                        context_score: <span className="text-slate-950 font-black">{agentStateInfo.contextScore}/100</span>
-                      </div>
-                    </div>
-
-                    <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium">
-                      {agentStateInfo.description}
-                    </p>
-
-                    {/* Technical State Micro-Grid */}
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 font-mono text-xs border-t border-slate-100">
-                      <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/70 space-y-0.5">
-                        <span className="text-[10px] text-slate-400 uppercase block">CONFIDENCE</span>
-                        <span className="font-bold text-[#7c3aed]">{agentStateInfo.confidence}</span>
-                      </div>
-                      <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/70 space-y-0.5">
-                        <span className="text-[10px] text-slate-400 uppercase block">MARKET BIAS</span>
-                        <span className="font-bold text-emerald-700">{agentStateInfo.marketBias}</span>
-                      </div>
-                      <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/70 space-y-0.5">
-                        <span className="text-[10px] text-slate-400 uppercase block">TRANSITION</span>
-                        <span className="font-bold text-[#7c3aed]">{agentStateInfo.transition}</span>
-                      </div>
-                      <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/70 space-y-0.5">
-                        <span className="text-[10px] text-slate-400 uppercase block">SYMBOL</span>
-                        <span className="font-bold text-slate-900">{marketData.symbol}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* WHAT CHANGED // 5M MODULE */}
-                  <div className="lg:col-span-5 bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] space-y-5 flex flex-col justify-between">
-                    <div className="flex items-center justify-between border-b border-slate-100 pb-4 font-mono">
-                      <div className="flex items-center gap-2 text-[#7c3aed]">
-                        <History className="w-4 h-4" />
-                        <span className="text-xs font-bold uppercase tracking-wider">
-                          WHAT CHANGED {whatChanged.hasHistory ? `// ${whatChanged.windowLabel}` : ''}
+                  <div className="lg:col-span-7 bg-white rounded-3xl p-6 sm:p-8 border border-purple-100 shadow-[0_4px_25px_rgba(124,58,237,0.04)] space-y-6 flex flex-col justify-between h-full">
+                    
+                    <div className="space-y-5">
+                      <div className="flex items-center justify-between border-b border-slate-100 pb-4 font-mono">
+                        <div className="flex items-center gap-2 text-[#7c3aed]">
+                          <Terminal className="w-4 h-4" />
+                          <span className="text-xs font-bold uppercase tracking-wider">AGENT STATE</span>
+                        </div>
+                        <span className="text-[11px] text-slate-400 font-mono">
+                          EVALUATED AT {marketData.lastUpdated}
                         </span>
                       </div>
-                      <span className="text-[10px] px-2 py-0.5 rounded bg-purple-50 text-[#7c3aed] border border-purple-200 font-bold">
-                        MEMORY BUFFER
-                      </span>
-                    </div>
 
-                    {!whatChanged.hasHistory ? (
-                      <div className="py-8 text-center space-y-2 font-mono">
-                        <RefreshCw className="w-5 h-5 text-[#7c3aed] animate-spin mx-auto" />
-                        <div className="text-xs font-bold text-slate-800">{whatChanged.statusMessage}</div>
-                        <p className="text-[11px] text-slate-500 max-w-xs mx-auto">{whatChanged.detail}</p>
-                      </div>
-                    ) : (
-                      <div className="space-y-3 font-mono text-xs">
-                        <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/70">
-                          <span className="text-slate-600">Buy Aggression (5m):</span>
-                          <span className={`font-extrabold ${whatChanged.buyAggressionDeltaPct.startsWith('+') ? 'text-emerald-700' : 'text-rose-700'}`}>
-                            {whatChanged.buyAggressionDeltaPct}
-                          </span>
+                      <div className="flex flex-wrap items-baseline justify-between gap-4">
+                        <div className="flex items-center gap-3">
+                          <span className="w-3.5 h-3.5 rounded-full bg-[#7c3aed] animate-pulse"></span>
+                          <h2 className="text-3xl sm:text-4xl font-mono font-black text-slate-950 tracking-tight">
+                            ● {agentStateInfo.state}
+                          </h2>
                         </div>
 
-                        <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/70">
-                          <span className="text-slate-600">Open Interest (5m):</span>
-                          <span className={`font-extrabold ${whatChanged.oiDeltaPct.startsWith('+') ? 'text-emerald-700' : 'text-rose-700'}`}>
-                            {whatChanged.oiDeltaPct}
-                          </span>
-                        </div>
-
-                        <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/70">
-                          <span className="text-slate-600">24h Quote Vol Velocity:</span>
-                          <span className="font-extrabold text-[#7c3aed]">{whatChanged.volumeDeltaPct}</span>
-                        </div>
-
-                        <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/70">
-                          <span className="text-slate-600">Price Response Trend:</span>
-                          <span className="font-extrabold text-slate-900">{whatChanged.priceResponse}</span>
-                        </div>
-
-                        <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/70">
-                          <span className="text-slate-600">Liquidation Pressure:</span>
-                          <span className="font-extrabold text-[#7c3aed]">{whatChanged.liquidationPressure}</span>
+                        <div className="px-3.5 py-1.5 rounded-xl bg-purple-50 border border-purple-200 text-xs font-mono font-bold text-[#7c3aed]">
+                          context_score: <span className="text-slate-950 font-black">{agentStateInfo.contextScore}/100</span>
                         </div>
                       </div>
-                    )}
 
-                    <div className="text-[10px] font-mono text-slate-400">
-                      Observation memory records live WebSocket and REST snapshots continuously.
+                      <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium">
+                        {agentStateInfo.description}
+                      </p>
                     </div>
+
+                    {/* Technical State Micro-Grid */}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 font-mono text-xs border-t border-slate-100">
+                      <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/70 space-y-0.5">
+                        <span className="text-[10px] text-slate-400 uppercase block font-bold">CONFIDENCE</span>
+                        <span className="font-bold text-[#7c3aed]">{agentStateInfo.confidence}</span>
+                      </div>
+                      <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/70 space-y-0.5">
+                        <span className="text-[10px] text-slate-400 uppercase block font-bold">MARKET BIAS</span>
+                        <span className="font-bold text-emerald-700">{agentStateInfo.marketBias}</span>
+                      </div>
+                      <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/70 space-y-0.5">
+                        <span className="text-[10px] text-slate-400 uppercase block font-bold">TRANSITION</span>
+                        <span className="font-bold text-[#7c3aed]">{agentStateInfo.transition}</span>
+                      </div>
+                      <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/70 space-y-0.5">
+                        <span className="text-[10px] text-slate-400 uppercase block font-bold">SYMBOL</span>
+                        <span className="font-bold text-slate-950">{marketData.symbol}</span>
+                      </div>
+                    </div>
+
+                  </div>
+
+                  {/* WHAT CHANGED HERO FEATURE (Right Column) */}
+                  <div className="lg:col-span-5 flex justify-center">
+                    <WhatChangedBlock whatChanged={whatChanged} isDemo={false} />
                   </div>
 
                 </div>
@@ -480,7 +421,7 @@ export default function MiniAppPage() {
                 </div>
 
                 {/* 5. ORDER FLOW PRIORITY MODULE */}
-                <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] space-y-6">
+                <div className="bg-white rounded-3xl p-6 sm:p-8 border border-purple-100 shadow-[0_4px_20px_rgba(124,58,237,0.03)] space-y-6">
                   <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-100 font-mono">
                     <div className="flex items-center gap-2 text-[#7c3aed]">
                       <Activity className="w-5 h-5" />
@@ -554,7 +495,7 @@ export default function MiniAppPage() {
                   </div>
 
                   {/* Right: Quant Context Engine Panel */}
-                  <div className="lg:col-span-5 bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] space-y-6 flex flex-col justify-between">
+                  <div className="lg:col-span-5 bg-white rounded-3xl p-6 sm:p-8 border border-purple-100 shadow-[0_4px_20px_rgba(124,58,237,0.03)] space-y-6 flex flex-col justify-between">
                     
                     <div className="space-y-5">
                       

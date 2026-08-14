@@ -2,6 +2,7 @@
  * symbolSubscriptionManager.js
  * Coordinates switching active trading symbols smoothly.
  * Integrates rolling 5-minute memory snapshot tracking via whatChangedTracker.
+ * Uses resolveSymbol to ensure valid Binance USD-M Futures tickers are passed.
  */
 
 import { fetchTickers24h, fetchOpenInterest, fetchPremiumIndex, fetchKlines } from './binanceRestClient';
@@ -9,6 +10,7 @@ import { normalizeSymbolData, normalizeWsMiniTicker, normalizeWsAggTrade, normal
 import { wsManager } from './binanceWebSocketManager';
 import { marketPollingService } from './marketPollingService';
 import { whatChangedTracker } from './whatChangedTracker';
+import { resolveSymbol } from './marketUniverseService';
 
 export class SymbolSubscriptionManager {
   constructor() {
@@ -46,7 +48,16 @@ export class SymbolSubscriptionManager {
   }
 
   async switchSymbol(symbol, timeframe = '15m') {
-    const targetSymbol = symbol.toUpperCase();
+    let targetSymbol = symbol ? symbol.toUpperCase().trim() : 'BTCUSDT';
+
+    // Auto-resolve user search input to valid active Binance USD-M contract ticker (e.g. 'sol' -> 'SOLUSDT', 'pepe' -> '1000PEPEUSDT')
+    try {
+      targetSymbol = await resolveSymbol(targetSymbol);
+    } catch (e) {
+      if (!targetSymbol.endsWith('USDT')) {
+        targetSymbol = `${targetSymbol}USDT`;
+      }
+    }
 
     // Reset history when switching to a brand new symbol so 5m comparison doesn't cross symbols
     if (this.currentSymbol !== targetSymbol) {
