@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && node scripts/prepare_static_routes.js",
+    "build": "vite build",
     "lint": "oxlint",
     "preview": "vite preview"
   },
