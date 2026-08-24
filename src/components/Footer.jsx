@@ -16,10 +16,11 @@ export default function Footer() {
             </span>
           </Link>
 
-          <div className="flex items-center space-x-8 font-semibold text-slate-700">
+          <div className="flex flex-wrap items-center justify-center gap-6 font-semibold text-slate-700">
             <a href="#reads" className="hover:text-[#7c3aed] transition-colors">What it Reads</a>
             <a href="#context" className="hover:text-[#7c3aed] transition-colors">Methodology</a>
             <Link to="/app" className="hover:text-[#7c3aed] transition-colors">Mini App</Link>
+            <Link to="/privacy" className="hover:text-[#7c3aed] transition-colors">Privacy Policy</Link>
           </div>
         </div>
 
