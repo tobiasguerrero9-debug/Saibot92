@@ -17,30 +17,30 @@ export default function WhatChangedBlock({ whatChanged, isDemo = false }) {
   const windowLabel = hasData ? whatChanged.windowLabel : '5M';
 
   return (
-    <div className="bg-white rounded-3xl p-6 sm:p-7 border border-purple-200/80 shadow-[0_10px_40px_rgba(124,58,237,0.08)] space-y-4 max-w-md w-full">
+    <div className="bg-white rounded-2xl p-6 sm:p-7 border border-[#E4E6EC] shadow-xs space-y-4 max-w-md w-full">
       
       {/* Header */}
-      <div className="flex items-center justify-between pb-3 border-b border-purple-100 font-mono">
+      <div className="flex items-center justify-between pb-3.5 border-b border-[#E4E6EC] font-mono">
         <div className="flex items-center gap-2.5">
-          <span className="p-2 rounded-xl bg-purple-50 text-[#7c3aed] border border-purple-200/60 shadow-sm">
+          <span className="p-1.5 rounded-xl bg-purple-50 text-[#7C3AED] border border-purple-200">
             <TrendingUp className="w-4 h-4" />
           </span>
-          <h3 className="text-base font-extrabold text-slate-950 tracking-tight flex items-center gap-1.5">
-            WHAT CHANGED <span className="text-[#7c3aed] font-mono">// {windowLabel}</span>
+          <h3 className="text-base font-extrabold text-[#12141A] tracking-tight flex items-center gap-1.5">
+            WHAT CHANGED <span className="text-[#7C3AED] font-mono">// {windowLabel}</span>
           </h3>
         </div>
 
         {isDemo ? (
-          <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-purple-50 text-[#7c3aed] border border-purple-200 uppercase tracking-wider">
+          <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-md bg-purple-50 text-[#7C3AED] border border-purple-200 uppercase tracking-wider">
             LIVE PREVIEW
           </span>
         ) : !hasData ? (
-          <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 flex items-center gap-1">
+          <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-md bg-amber-50 text-amber-700 border border-amber-200 flex items-center gap-1">
             <RefreshCw className="w-3 h-3 animate-spin" />
             <span>RECORDING</span>
           </span>
         ) : (
-          <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-purple-50 text-[#7c3aed] border border-purple-200 uppercase tracking-wider">
+          <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-md bg-purple-50 text-[#7C3AED] border border-purple-200 uppercase tracking-wider">
             MEMORY ACTIVE
           </span>
         )}
@@ -49,76 +49,76 @@ export default function WhatChangedBlock({ whatChanged, isDemo = false }) {
       {/* Rows */}
       {!hasData && !isDemo ? (
         <div className="py-8 text-center space-y-2 font-mono">
-          <RefreshCw className="w-5 h-5 text-[#7c3aed] animate-spin mx-auto" />
-          <div className="text-xs font-bold text-slate-800">{whatChanged?.statusMessage || 'COLLECTING MARKET HISTORY...'}</div>
-          <p className="text-[11px] text-slate-500 max-w-xs mx-auto">
+          <RefreshCw className="w-5 h-5 text-[#7C3AED] animate-spin mx-auto" />
+          <div className="text-xs font-bold text-[#12141A]">{whatChanged?.statusMessage || 'COLLECTING MARKET HISTORY...'}</div>
+          <p className="text-[11px] text-[#5E6675] max-w-xs mx-auto">
             {whatChanged?.detail || 'Not enough recent observations to calculate short-term change.'}
           </p>
         </div>
       ) : (
-        <div className="space-y-3 font-mono text-sm">
+        <div className="space-y-2 font-mono text-sm">
           
           {/* Row 1: Buy aggression */}
-          <div className="flex items-center justify-between p-3 rounded-2xl bg-purple-50/40 border border-purple-100/70 hover:border-purple-200 transition-colors">
+          <div className="flex items-center justify-between p-3 rounded-xl bg-[#F2F3F7] border border-[#E4E6EC] hover:border-purple-200 transition-colors">
             <div className="flex items-center gap-3">
-              <span className="p-2 rounded-xl bg-purple-50 text-[#7c3aed] shrink-0 border border-purple-100">
+              <span className="p-1.5 rounded-lg bg-white text-[#7C3AED] shrink-0 border border-[#E4E6EC]">
                 <TrendingUp className="w-4 h-4" />
               </span>
-              <span className="font-semibold text-slate-800 text-xs sm:text-sm">Buy aggression</span>
+              <span className="font-semibold text-[#12141A] text-xs sm:text-sm">Buy aggression</span>
             </div>
-            <span className="font-extrabold text-[#7c3aed] text-sm sm:text-base">
+            <span className="font-extrabold text-[#7C3AED] text-sm sm:text-base">
               {buyAggression}
             </span>
           </div>
 
           {/* Row 2: Open interest */}
-          <div className="flex items-center justify-between p-3 rounded-2xl bg-purple-50/40 border border-purple-100/70 hover:border-purple-200 transition-colors">
+          <div className="flex items-center justify-between p-3 rounded-xl bg-[#F2F3F7] border border-[#E4E6EC] hover:border-purple-200 transition-colors">
             <div className="flex items-center gap-3">
-              <span className="p-2 rounded-xl bg-purple-50 text-[#7c3aed] shrink-0 border border-purple-100">
+              <span className="p-1.5 rounded-lg bg-white text-[#7C3AED] shrink-0 border border-[#E4E6EC]">
                 <BarChart2 className="w-4 h-4" />
               </span>
-              <span className="font-semibold text-slate-800 text-xs sm:text-sm">Open interest</span>
+              <span className="font-semibold text-[#12141A] text-xs sm:text-sm">Open interest</span>
             </div>
-            <span className="font-extrabold text-[#7c3aed] text-sm sm:text-base">
+            <span className="font-extrabold text-[#7C3AED] text-sm sm:text-base">
               {openInterest}
             </span>
           </div>
 
           {/* Row 3: Volume */}
-          <div className="flex items-center justify-between p-3 rounded-2xl bg-purple-50/40 border border-purple-100/70 hover:border-purple-200 transition-colors">
+          <div className="flex items-center justify-between p-3 rounded-xl bg-[#F2F3F7] border border-[#E4E6EC] hover:border-purple-200 transition-colors">
             <div className="flex items-center gap-3">
-              <span className="p-2 rounded-xl bg-purple-50 text-[#7c3aed] shrink-0 border border-purple-100">
+              <span className="p-1.5 rounded-lg bg-white text-[#7C3AED] shrink-0 border border-[#E4E6EC]">
                 <Layers className="w-4 h-4" />
               </span>
-              <span className="font-semibold text-slate-800 text-xs sm:text-sm">Volume</span>
+              <span className="font-semibold text-[#12141A] text-xs sm:text-sm">Volume</span>
             </div>
-            <span className="font-extrabold text-[#7c3aed] text-sm sm:text-base">
+            <span className="font-extrabold text-[#7C3AED] text-sm sm:text-base">
               {volume}
             </span>
           </div>
 
           {/* Row 4: Price response */}
-          <div className="flex items-center justify-between p-3 rounded-2xl bg-purple-50/40 border border-purple-100/70 hover:border-purple-200 transition-colors">
+          <div className="flex items-center justify-between p-3 rounded-xl bg-[#F2F3F7] border border-[#E4E6EC] hover:border-purple-200 transition-colors">
             <div className="flex items-center gap-3">
-              <span className="p-2 rounded-xl bg-purple-50 text-[#7c3aed] shrink-0 border border-purple-100">
+              <span className="p-1.5 rounded-lg bg-white text-[#7C3AED] shrink-0 border border-[#E4E6EC]">
                 <Activity className="w-4 h-4" />
               </span>
-              <span className="font-semibold text-slate-800 text-xs sm:text-sm">Price response</span>
+              <span className="font-semibold text-[#12141A] text-xs sm:text-sm">Price response</span>
             </div>
-            <span className="font-extrabold text-[#7c3aed] text-sm sm:text-base">
+            <span className="font-extrabold text-[#7C3AED] text-sm sm:text-base">
               {priceResponse}
             </span>
           </div>
 
           {/* Row 5: Liquidation pressure */}
-          <div className="flex items-center justify-between p-3 rounded-2xl bg-purple-50/40 border border-purple-100/70 hover:border-purple-200 transition-colors">
+          <div className="flex items-center justify-between p-3 rounded-xl bg-[#F2F3F7] border border-[#E4E6EC] hover:border-purple-200 transition-colors">
             <div className="flex items-center gap-3">
-              <span className="p-2 rounded-xl bg-purple-50 text-[#7c3aed] shrink-0 border border-purple-100">
+              <span className="p-1.5 rounded-lg bg-white text-[#7C3AED] shrink-0 border border-[#E4E6EC]">
                 <Zap className="w-4 h-4" />
               </span>
-              <span className="font-semibold text-slate-800 text-xs sm:text-sm">Liquidation pressure</span>
+              <span className="font-semibold text-[#12141A] text-xs sm:text-sm">Liquidation pressure</span>
             </div>
-            <span className="font-extrabold text-[#7c3aed] text-sm sm:text-base">
+            <span className="font-extrabold text-[#7C3AED] text-sm sm:text-base">
               {liquidationPressure}
             </span>
           </div>
