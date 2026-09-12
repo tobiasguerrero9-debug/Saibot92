@@ -90,7 +90,7 @@ export default function WebMarketSearch({ onSelectSymbol, activeSymbol }) {
   return (
     <div ref={searchRef} className="relative flex-1 max-w-sm font-mono">
       <form onSubmit={handleFormSubmit} className="relative">
-        <Search className="w-4 h-4 text-[#8C94A3] absolute left-3 top-1/2 -translate-y-1/2" />
+        <Search className="w-4 h-4 text-[#9CA3AF] absolute left-3 top-1/2 -translate-y-1/2" />
         <input
           type="text"
           value={query}
@@ -98,7 +98,7 @@ export default function WebMarketSearch({ onSelectSymbol, activeSymbol }) {
           onFocus={() => query.trim() && setIsOpen(true)}
           onKeyDown={handleKeyDown}
           placeholder="Switch symbol (e.g. AVAXUSDT, NEAR)..."
-          className="w-full pl-9 pr-16 py-1.5 rounded-xl bg-[#F2F3F7] border border-[#E4E6EC] text-xs text-[#12141A] focus:outline-none focus:border-[#7C3AED] focus:bg-white transition-all shadow-inner"
+          className="w-full pl-9 pr-16 py-1.5 rounded-xl bg-white/[0.035] border border-white/10 text-xs text-[#F8F8FC] placeholder-[#9CA3AF] focus:outline-none focus:border-[#C084FC] focus:bg-black/30 transition-all"
         />
         {query ? (
           <button
@@ -107,14 +107,14 @@ export default function WebMarketSearch({ onSelectSymbol, activeSymbol }) {
               setQuery('');
               setIsOpen(false);
             }}
-            className="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-bold text-[#8C94A3] hover:text-[#12141A] px-1"
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-bold text-[#9CA3AF] hover:text-[#F8F8FC] px-1"
           >
             Clear
           </button>
         ) : (
           <button
             type="submit"
-            className="absolute right-1.5 top-1/2 -translate-y-1/2 px-2.5 py-1 rounded-lg bg-purple-100 hover:bg-purple-200 text-[#7C3AED] font-mono text-[10px] font-bold transition-colors"
+            className="absolute right-1.5 top-1/2 -translate-y-1/2 px-2.5 py-1 rounded-lg bg-purple-950/60 border border-purple-500/40 hover:bg-purple-900/60 text-[#C084FC] font-mono text-[10px] font-bold transition-colors"
           >
             GO
           </button>
@@ -123,15 +123,15 @@ export default function WebMarketSearch({ onSelectSymbol, activeSymbol }) {
 
       {/* Autocomplete Dropdown */}
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-1.5 bg-white border border-[#E4E6EC] rounded-2xl shadow-md z-50 overflow-hidden font-mono text-xs max-h-64 overflow-y-auto">
+        <div className="absolute top-full left-0 right-0 mt-1.5 bg-[#14111C] border border-purple-500/30 rounded-2xl shadow-[0_8px_24px_rgba(0,0,0,0.5)] z-50 overflow-hidden font-mono text-xs max-h-64 overflow-y-auto">
           {isLoading && (
-            <div className="p-3 text-center text-[#8C94A3] text-[11px]">
+            <div className="p-3 text-center text-[#9CA3AF] text-[11px]">
               Loading active futures universe...
             </div>
           )}
 
           {!isLoading && results.length === 0 && (
-            <div className="p-3.5 text-center text-[#5E6675] font-medium text-[11px]">
+            <div className="p-3.5 text-center text-[#AEB5C3] font-medium text-[11px]">
               No matching perpetual market.
             </div>
           )}
@@ -147,14 +147,14 @@ export default function WebMarketSearch({ onSelectSymbol, activeSymbol }) {
                   onClick={() => handleSelect(sym)}
                   className={`px-3.5 py-2.5 flex items-center justify-between cursor-pointer transition-colors ${
                     isFocused || isActive
-                      ? 'bg-purple-50 text-[#7C3AED] font-bold'
-                      : 'hover:bg-purple-50/50 text-[#12141A]'
+                      ? 'bg-purple-950/60 text-[#C084FC] font-bold'
+                      : 'hover:bg-white/[0.04] text-[#F8F8FC]'
                   }`}
                 >
                   <div className="flex items-center gap-2">
                     <span className="font-extrabold">{sym}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-[10px] text-[#8C94A3]">
+                  <div className="flex items-center gap-2 text-[10px] text-[#9CA3AF]">
                     <span>USD-M PERP</span>
                     {isActive && (
                       <span className="px-1.5 py-0.5 rounded bg-[#7C3AED] text-white font-bold text-[9px]">

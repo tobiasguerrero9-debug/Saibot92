@@ -1,11 +1,17 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowUpRight, Terminal } from 'lucide-react';
+import TopMarketTickerStrip from './TopMarketTickerStrip';
 
 export default function Hero() {
   return (
-    <section className="relative pt-16 pb-20 sm:pt-24 sm:pb-24 overflow-hidden bg-[#FAFAFC] text-[#10131A]">
+    <section className="relative pt-6 pb-20 sm:pt-8 sm:pb-24 overflow-hidden bg-[#FAFAFC] text-[#10131A]">
       
+      {/* Top 10 Market Terminal Strip */}
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 mb-8 sm:mb-10">
+        <TopMarketTickerStrip />
+      </div>
+
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
           

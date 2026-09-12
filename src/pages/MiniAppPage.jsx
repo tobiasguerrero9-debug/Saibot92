@@ -163,37 +163,43 @@ export default function MiniAppPage() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         
         {/* 2. CONTROL BAR */}
-        <div className="bg-white rounded-2xl p-5 border border-[#E4E6EC] shadow-xs space-y-4 font-mono">
+        <div 
+          className="rounded-2xl p-5 border shadow-md space-y-4 font-mono"
+          style={{
+            background: 'linear-gradient(135deg, #101116 0%, #15121D 100%)',
+            borderColor: 'rgba(139, 92, 246, 0.25)'
+          }}
+        >
           
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             
             {/* Featured Markets Chips */}
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-bold text-[#8C94A3] uppercase mr-1">Featured:</span>
+              <span className="text-xs font-bold text-[#9CA3AF] uppercase mr-1">Featured:</span>
               {FEATURED_SYMBOLS.map((sym) => (
                 <button
                   key={sym}
                   onClick={() => handleSymbolChange(sym)}
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
                     selectedSymbol === sym
-                      ? 'bg-[#7C3AED] text-white shadow-xs'
-                      : 'bg-[#F2F3F7] hover:bg-purple-50 text-[#5E6675] border border-[#E4E6EC]'
+                      ? 'bg-[#7C3AED] text-white border border-[#A78BFA] shadow-[0_2px_10px_rgba(124,58,237,0.3)]'
+                      : 'bg-white/[0.035] hover:bg-white/[0.08] text-[#AEB5C3] border border-white/10'
                   }`}
                 >
-                  <Star className={`w-3 h-3 ${selectedSymbol === sym ? 'fill-current text-white' : 'text-[#8C94A3]'}`} />
+                  <Star className={`w-3 h-3 ${selectedSymbol === sym ? 'fill-current text-white' : 'text-[#9CA3AF]'}`} />
                   <span>{sym}</span>
                 </button>
               ))}
             </div>
 
             {/* View Switcher Tabs */}
-            <div className="flex items-center space-x-1 bg-[#F2F3F7] p-1 rounded-xl border border-[#E4E6EC]">
+            <div className="flex items-center space-x-1 bg-[#13111A] p-1 rounded-xl border border-white/10">
               <button
                 onClick={() => setActiveTab('intelligence')}
                 className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
                   activeTab === 'intelligence'
-                    ? 'bg-white text-[#7C3AED] shadow-xs border border-[#E4E6EC]'
-                    : 'text-[#5E6675] hover:text-[#12141A]'
+                    ? 'bg-[#7C3AED] text-white shadow-xs'
+                    : 'text-[#9CA3AF] hover:text-[#F8F8FC]'
                 }`}
               >
                 Agent Intelligence
@@ -202,8 +208,8 @@ export default function MiniAppPage() {
                 onClick={() => setActiveTab('scanner')}
                 className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
                   activeTab === 'scanner'
-                    ? 'bg-white text-[#7C3AED] shadow-xs border border-[#E4E6EC]'
-                    : 'text-[#5E6675] hover:text-[#12141A]'
+                    ? 'bg-[#7C3AED] text-white shadow-xs'
+                    : 'text-[#9CA3AF] hover:text-[#F8F8FC]'
                 }`}
               >
                 Market Scanner
@@ -214,7 +220,7 @@ export default function MiniAppPage() {
 
           {/* Sub-Control Bar: Symbol Search Input & Timeframe selector */}
           {activeTab === 'intelligence' && (
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-3 border-t border-[#E4E6EC]">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-3 border-t border-white/10">
               
               {/* Quick Search Autocomplete */}
               <WebMarketSearch
@@ -224,15 +230,15 @@ export default function MiniAppPage() {
 
               {/* Timeframe Selector */}
               <div className="flex items-center gap-2 text-xs">
-                <span className="font-bold text-[#8C94A3] uppercase mr-1">Candle Feed:</span>
+                <span className="font-bold text-[#9CA3AF] uppercase mr-1">Candle Feed:</span>
                 {TIMEFRAMES.map((tf) => (
                   <button
                     key={tf}
                     onClick={() => setSelectedTimeframe(tf)}
                     className={`px-3 py-1 rounded-lg font-bold transition-all ${
                       selectedTimeframe === tf
-                        ? 'bg-[#12141A] text-white shadow-xs'
-                        : 'bg-[#F2F3F7] hover:bg-slate-200 text-[#5E6675]'
+                        ? 'bg-[#7C3AED] text-white shadow-xs'
+                        : 'bg-white/[0.035] hover:bg-white/[0.08] text-[#AEB5C3] border border-white/10'
                     }`}
                   >
                     {tf}
@@ -261,19 +267,19 @@ export default function MiniAppPage() {
           <>
             {/* Loading State */}
             {connectionState === 'LOADING' && !marketData && (
-              <div className="bg-white rounded-2xl p-16 text-center space-y-4 border border-[#E4E6EC] shadow-xs font-mono">
-                <RefreshCw className="w-8 h-8 text-[#7C3AED] animate-spin mx-auto" />
-                <h3 className="text-lg font-bold text-[#12141A]">Connecting to Binance USD-M Futures Stream...</h3>
-                <p className="text-xs text-[#8C94A3]">Fetching public REST snapshot & subscribing to WebSockets for {selectedSymbol}</p>
+              <div className="bg-[#101116] rounded-2xl p-16 text-center space-y-4 border border-purple-500/30 text-[#F8F8FC] font-mono">
+                <RefreshCw className="w-8 h-8 text-[#C084FC] animate-spin mx-auto" />
+                <h3 className="text-lg font-bold text-[#F8F8FC]">Connecting to Binance USD-M Futures Stream...</h3>
+                <p className="text-xs text-[#AEB5C3]">Fetching public REST snapshot & subscribing to WebSockets for {selectedSymbol}</p>
               </div>
             )}
 
             {/* Offline Error State */}
             {connectionState === 'OFFLINE' && !marketData && (
-              <div className="bg-rose-50 rounded-2xl p-12 text-center space-y-4 border border-rose-200 shadow-xs font-mono">
-                <AlertCircle className="w-10 h-10 text-rose-600 mx-auto" />
-                <h3 className="text-xl font-bold text-rose-950">Public Binance Futures Telemetry Offline</h3>
-                <p className="text-sm text-rose-700 max-w-md mx-auto">Unable to reach public REST endpoint. Retrying connection...</p>
+              <div className="bg-rose-950/40 rounded-2xl p-12 text-center space-y-4 border border-rose-500/30 text-[#F8F8FC] font-mono">
+                <AlertCircle className="w-10 h-10 text-rose-500 mx-auto" />
+                <h3 className="text-xl font-bold text-rose-200">Public Binance Futures Telemetry Offline</h3>
+                <p className="text-sm text-rose-300 max-w-md mx-auto">Unable to reach public REST endpoint. Retrying connection...</p>
                 <button
                   onClick={handleManualRefresh}
                   className="px-6 py-2.5 rounded-full bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-xs"
@@ -291,54 +297,85 @@ export default function MiniAppPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start font-mono">
                   
                   {/* AGENT STATE MODULE */}
-                  <div className="lg:col-span-7 bg-white rounded-2xl p-6 sm:p-8 border border-[#E4E6EC] shadow-xs space-y-6 flex flex-col justify-between h-full">
+                  <div 
+                    className="lg:col-span-7 rounded-2xl p-6 sm:p-8 space-y-6 flex flex-col justify-between h-full font-mono shadow-[0_8px_28px_rgba(0,0,0,0.35)]"
+                    style={{
+                      background: 'linear-gradient(135deg, #101116 0%, #17131F 100%)',
+                      border: '1px solid rgba(139, 92, 246, 0.34)',
+                      boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 8px 28px rgba(0,0,0,0.35)'
+                    }}
+                  >
                     
                     <div className="space-y-5">
-                      <div className="flex items-center justify-between border-b border-[#E4E6EC] pb-4">
-                        <div className="flex items-center gap-2 text-[#7C3AED]">
-                          <Terminal className="w-4 h-4 text-[#7C3AED]" />
+                      <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                        <div className="flex items-center gap-2 text-[#C084FC]">
+                          <Terminal className="w-4 h-4 text-[#C084FC]" />
                           <span className="text-xs font-bold uppercase tracking-wider">AGENT STATE</span>
                         </div>
-                        <span className="text-[11px] text-[#8C94A3]">
+                        <span className="text-[11px] text-[#9CA3AF]">
                           EVALUATED AT {marketData.lastUpdated}
                         </span>
                       </div>
 
                       <div className="flex flex-wrap items-baseline justify-between gap-4">
                         <div className="flex items-center gap-3">
-                          <span className="w-3.5 h-3.5 rounded-full bg-[#10B981] animate-pulse"></span>
-                          <h2 className="text-3xl sm:text-4xl font-black text-[#12141A] tracking-tight">
+                          <span className="w-3.5 h-3.5 rounded-full bg-[#34D399] animate-pulse"></span>
+                          <h2 className="text-3xl sm:text-4xl font-black text-[#F8F8FC] tracking-tight">
                             ● {agentStateInfo.state}
                           </h2>
                         </div>
 
-                        <div className="px-3.5 py-1.5 rounded-xl bg-purple-50 border border-purple-200 text-xs font-bold text-[#5B21B6]">
-                          context_score: <span className="text-[#12141A] font-black">{agentStateInfo.contextScore}/100</span>
+                        <div className="px-3.5 py-1.5 rounded-xl bg-purple-950/50 border border-purple-500/30 text-xs font-bold text-[#C084FC]">
+                          context_score: <span className="text-[#F8F8FC] font-black">{agentStateInfo.contextScore}/100</span>
                         </div>
                       </div>
 
-                      <p className="text-xs sm:text-sm text-[#5E6675] font-sans leading-relaxed font-medium">
+                      <p className="text-xs sm:text-sm text-[#AEB5C3] font-sans leading-relaxed font-medium">
                         {agentStateInfo.description}
                       </p>
                     </div>
 
                     {/* Technical State Micro-Grid */}
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 text-xs border-t border-[#E4E6EC]">
-                      <div className="p-3 rounded-xl bg-[#F2F3F7] border border-[#E4E6EC] space-y-0.5">
-                        <span className="text-[10px] text-[#8C94A3] uppercase block font-bold">CONFIDENCE</span>
-                        <span className="font-bold text-[#7C3AED]">{agentStateInfo.confidence}</span>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 text-xs border-t border-white/10">
+                      <div 
+                        className="p-3 rounded-xl border space-y-0.5"
+                        style={{
+                          backgroundColor: 'rgba(255, 255, 255, 0.035)',
+                          borderColor: 'rgba(255, 255, 255, 0.07)'
+                        }}
+                      >
+                        <span className="text-[10px] text-[#9CA3AF] uppercase block font-bold">CONFIDENCE</span>
+                        <span className="font-bold text-[#C084FC]">{agentStateInfo.confidence}</span>
                       </div>
-                      <div className="p-3 rounded-xl bg-[#F2F3F7] border border-[#E4E6EC] space-y-0.5">
-                        <span className="text-[10px] text-[#8C94A3] uppercase block font-bold">MARKET BIAS</span>
-                        <span className="font-bold text-[#10B981]">{agentStateInfo.marketBias}</span>
+                      <div 
+                        className="p-3 rounded-xl border space-y-0.5"
+                        style={{
+                          backgroundColor: 'rgba(255, 255, 255, 0.035)',
+                          borderColor: 'rgba(255, 255, 255, 0.07)'
+                        }}
+                      >
+                        <span className="text-[10px] text-[#9CA3AF] uppercase block font-bold">MARKET BIAS</span>
+                        <span className="font-bold text-[#34D399]">{agentStateInfo.marketBias}</span>
                       </div>
-                      <div className="p-3 rounded-xl bg-[#F2F3F7] border border-[#E4E6EC] space-y-0.5">
-                        <span className="text-[10px] text-[#8C94A3] uppercase block font-bold">TRANSITION</span>
-                        <span className="font-bold text-[#0891B2]">{agentStateInfo.transition}</span>
+                      <div 
+                        className="p-3 rounded-xl border space-y-0.5"
+                        style={{
+                          backgroundColor: 'rgba(255, 255, 255, 0.035)',
+                          borderColor: 'rgba(255, 255, 255, 0.07)'
+                        }}
+                      >
+                        <span className="text-[10px] text-[#9CA3AF] uppercase block font-bold">TRANSITION</span>
+                        <span className="font-bold text-[#22D3EE]">{agentStateInfo.transition}</span>
                       </div>
-                      <div className="p-3 rounded-xl bg-[#F2F3F7] border border-[#E4E6EC] space-y-0.5">
-                        <span className="text-[10px] text-[#8C94A3] uppercase block font-bold">SYMBOL</span>
-                        <span className="font-bold text-[#12141A]">{marketData.symbol}</span>
+                      <div 
+                        className="p-3 rounded-xl border space-y-0.5"
+                        style={{
+                          backgroundColor: 'rgba(255, 255, 255, 0.035)',
+                          borderColor: 'rgba(255, 255, 255, 0.07)'
+                        }}
+                      >
+                        <span className="text-[10px] text-[#9CA3AF] uppercase block font-bold">SYMBOL</span>
+                        <span className="font-bold text-[#F8F8FC]">{marketData.symbol}</span>
                       </div>
                     </div>
 
@@ -355,60 +392,96 @@ export default function MiniAppPage() {
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 font-mono">
                   
                   {/* Price */}
-                  <div className="bg-white rounded-xl p-4 sm:p-5 border border-[#E4E6EC] shadow-xs space-y-1.5 hover:border-purple-300 transition-all">
-                    <span className="text-[10px] font-bold text-[#8C94A3] uppercase tracking-wider block">SPOT PRICE</span>
-                    <div className="text-xl sm:text-2xl font-black text-[#12141A]">
+                  <div 
+                    className="rounded-xl p-4 sm:p-5 border space-y-1.5 transition-all"
+                    style={{
+                      background: 'linear-gradient(180deg, #121319 0%, #17151E 100%)',
+                      borderColor: 'rgba(255, 255, 255, 0.07)'
+                    }}
+                  >
+                    <span className="text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider block">SPOT PRICE</span>
+                    <div className="text-xl sm:text-2xl font-black text-[#F8F8FC]">
                       ${marketData.price > 10 ? marketData.price.toLocaleString(undefined, { minimumFractionDigits: 2 }) : marketData.price.toFixed(4)}
                     </div>
-                    <span className={`text-[11px] font-bold flex items-center gap-1 ${marketData.priceChange24h >= 0 ? 'text-[#10B981]' : 'text-rose-600'}`}>
+                    <span className={`text-[11px] font-bold flex items-center gap-1 ${marketData.priceChange24h >= 0 ? 'text-[#34D399]' : 'text-rose-500'}`}>
                       {marketData.priceChange24h >= 0 ? '+' : ''}{marketData.priceChange24h.toFixed(2)}%
                     </span>
                   </div>
 
                   {/* 24h Volume */}
-                  <div className="bg-white rounded-xl p-4 sm:p-5 border border-[#E4E6EC] shadow-xs space-y-1.5 hover:border-purple-300 transition-all">
-                    <span className="text-[10px] font-bold text-[#8C94A3] uppercase tracking-wider block">24H QUOTE VOL</span>
-                    <div className="text-xl sm:text-2xl font-black text-[#12141A]">
+                  <div 
+                    className="rounded-xl p-4 sm:p-5 border space-y-1.5 transition-all"
+                    style={{
+                      background: 'linear-gradient(180deg, #121319 0%, #17151E 100%)',
+                      borderColor: 'rgba(255, 255, 255, 0.07)'
+                    }}
+                  >
+                    <span className="text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider block">24H QUOTE VOL</span>
+                    <div className="text-xl sm:text-2xl font-black text-[#F8F8FC]">
                       ${(marketData.quoteVolume24h / 1e9).toFixed(2)}B
                     </div>
-                    <span className="text-[10px] text-[#8C94A3] block font-sans">Market liquidity depth</span>
+                    <span className="text-[10px] text-[#9CA3AF] block font-sans">Market liquidity depth</span>
                   </div>
 
                   {/* Open Interest */}
-                  <div className="bg-white rounded-xl p-4 sm:p-5 border border-[#E4E6EC] shadow-xs space-y-1.5 hover:border-purple-300 transition-all">
-                    <span className="text-[10px] font-bold text-[#8C94A3] uppercase tracking-wider block">OPEN INTEREST</span>
-                    <div className="text-xl sm:text-2xl font-black text-[#7C3AED]">
+                  <div 
+                    className="rounded-xl p-4 sm:p-5 border space-y-1.5 transition-all"
+                    style={{
+                      background: 'linear-gradient(180deg, #121319 0%, #17151E 100%)',
+                      borderColor: 'rgba(255, 255, 255, 0.07)'
+                    }}
+                  >
+                    <span className="text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider block">OPEN INTEREST</span>
+                    <div className="text-xl sm:text-2xl font-black text-[#C084FC]">
                       ${(marketData.openInterestUsd / 1e9).toFixed(2)}B
                     </div>
-                    <span className="text-[10px] text-[#8C94A3] block font-sans">{(marketData.openInterestCoins / 1e3).toFixed(0)}k contract coins</span>
+                    <span className="text-[10px] text-[#9CA3AF] block font-sans">{(marketData.openInterestCoins / 1e3).toFixed(0)}k contract coins</span>
                   </div>
 
                   {/* Funding Rate */}
-                  <div className="bg-white rounded-xl p-4 sm:p-5 border border-[#E4E6EC] shadow-xs space-y-1.5 hover:border-purple-300 transition-all">
-                    <span className="text-[10px] font-bold text-[#8C94A3] uppercase tracking-wider block">FUNDING RATE</span>
-                    <div className={`text-xl sm:text-2xl font-black ${marketData.fundingRate >= 0 ? 'text-[#10B981]' : 'text-rose-600'}`}>
+                  <div 
+                    className="rounded-xl p-4 sm:p-5 border space-y-1.5 transition-all"
+                    style={{
+                      background: 'linear-gradient(180deg, #121319 0%, #17151E 100%)',
+                      borderColor: 'rgba(255, 255, 255, 0.07)'
+                    }}
+                  >
+                    <span className="text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider block">FUNDING RATE</span>
+                    <div className={`text-xl sm:text-2xl font-black ${marketData.fundingRate >= 0 ? 'text-[#34D399]' : 'text-rose-500'}`}>
                       {(marketData.fundingRate * 100).toFixed(4)}%
                     </div>
-                    <span className="text-[10px] text-[#8C94A3] block font-sans">8h carry (Baseline 0.01%)</span>
+                    <span className="text-[10px] text-[#9CA3AF] block font-sans">8h carry (Baseline 0.01%)</span>
                   </div>
 
                   {/* Mark Price */}
-                  <div className="bg-white rounded-xl p-4 sm:p-5 border border-[#E4E6EC] shadow-xs space-y-1.5 hover:border-purple-300 transition-all">
-                    <span className="text-[10px] font-bold text-[#8C94A3] uppercase tracking-wider block">MARK PRICE</span>
-                    <div className="text-xl sm:text-2xl font-black text-[#12141A]">
+                  <div 
+                    className="rounded-xl p-4 sm:p-5 border space-y-1.5 transition-all"
+                    style={{
+                      background: 'linear-gradient(180deg, #121319 0%, #17151E 100%)',
+                      borderColor: 'rgba(255, 255, 255, 0.07)'
+                    }}
+                  >
+                    <span className="text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider block">MARK PRICE</span>
+                    <div className="text-xl sm:text-2xl font-black text-[#F8F8FC]">
                       ${marketData.markPrice > 10 ? marketData.markPrice.toLocaleString(undefined, { minimumFractionDigits: 2 }) : marketData.markPrice.toFixed(4)}
                     </div>
-                    <span className="text-[10px] text-[#8C94A3] block font-sans">Liquidation reference</span>
+                    <span className="text-[10px] text-[#9CA3AF] block font-sans">Liquidation reference</span>
                   </div>
 
                   {/* 24h High/Low */}
-                  <div className="bg-white rounded-xl p-4 sm:p-5 border border-[#E4E6EC] shadow-xs space-y-1.5 hover:border-purple-300 transition-all">
-                    <span className="text-[10px] font-bold text-[#8C94A3] uppercase tracking-wider block">24H HIGH / LOW</span>
-                    <div className="text-xs font-bold text-[#12141A] space-y-0.5">
-                      <div className="text-[#10B981]">H: ${marketData.high24h.toLocaleString()}</div>
-                      <div className="text-rose-600">L: ${marketData.low24h.toLocaleString()}</div>
+                  <div 
+                    className="rounded-xl p-4 sm:p-5 border space-y-1.5 transition-all"
+                    style={{
+                      background: 'linear-gradient(180deg, #121319 0%, #17151E 100%)',
+                      borderColor: 'rgba(255, 255, 255, 0.07)'
+                    }}
+                  >
+                    <span className="text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider block">24H HIGH / LOW</span>
+                    <div className="text-xs font-bold text-[#F8F8FC] space-y-0.5">
+                      <div className="text-[#34D399]">H: ${marketData.high24h.toLocaleString()}</div>
+                      <div className="text-rose-500">L: ${marketData.low24h.toLocaleString()}</div>
                     </div>
-                    <span className="text-[10px] text-[#8C94A3] block font-sans">Daily dispersion range</span>
+                    <span className="text-[10px] text-[#9CA3AF] block font-sans">Daily dispersion range</span>
                   </div>
 
                 </div>
@@ -504,41 +577,60 @@ export default function MiniAppPage() {
                   </div>
 
                   {/* Right: Quant Context Engine Panel */}
-                  <div className="lg:col-span-5 bg-white rounded-2xl p-6 sm:p-8 border border-[#E4E6EC] shadow-xs space-y-6 flex flex-col justify-between">
+                  <div 
+                    className="lg:col-span-5 rounded-2xl p-6 sm:p-8 space-y-6 flex flex-col justify-between font-mono shadow-[0_8px_24px_rgba(0,0,0,0.35)] border"
+                    style={{
+                      background: 'linear-gradient(135deg, #101116 0%, #17131F 100%)',
+                      borderColor: 'rgba(0, 190, 220, 0.25)',
+                      boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 8px 24px rgba(0, 0, 0, 0.35)'
+                    }}
+                  >
                     
                     <div className="space-y-5">
                       
                       {/* Context Scene & Data Score Gauge */}
-                      <div className="flex items-center justify-between border-b border-[#E4E6EC] pb-4">
+                      <div className="flex items-center justify-between border-b border-white/10 pb-4">
                         <div>
-                          <span className="text-[11px] font-bold text-[#7C3AED] uppercase tracking-wider block">MARKET CONTEXT STATE</span>
-                          <h3 className="text-xl font-extrabold text-[#12141A] tracking-tight">{analysis.condition}</h3>
+                          <span className="text-[11px] font-bold text-[#C084FC] uppercase tracking-wider block">MARKET CONTEXT STATE</span>
+                          <h3 className="text-xl font-extrabold text-[#F8F8FC] tracking-tight">{analysis.condition}</h3>
                         </div>
 
-                        <div className="text-right bg-purple-50 border border-purple-200 px-3.5 py-2 rounded-xl">
-                          <span className="text-[10px] font-bold text-[#5E6675] block">DATA SCORE</span>
-                          <div className="text-2xl font-black text-[#7C3AED]">{analysis.score}<span className="text-xs text-[#8C94A3] font-normal">/100</span></div>
+                        <div className="text-right bg-cyan-950/40 border border-cyan-500/30 px-3.5 py-2 rounded-xl">
+                          <span className="text-[10px] font-bold text-[#9CA3AF] block">DATA SCORE</span>
+                          <div className="text-2xl font-black text-[#22D3EE]">{analysis.score}<span className="text-xs text-[#9CA3AF] font-normal">/100</span></div>
                         </div>
                       </div>
 
                       {/* Transition Pressure */}
-                      <div className="flex items-center justify-between p-3.5 rounded-xl bg-[#F2F3F7] border border-[#E4E6EC] text-xs">
-                        <span className="text-[#5E6675] font-bold">Transition Pressure:</span>
-                        <span className="font-extrabold px-2.5 py-1 rounded-lg bg-purple-100 text-[#7C3AED]">
+                      <div 
+                        className="flex items-center justify-between p-3.5 rounded-xl border text-xs"
+                        style={{
+                          backgroundColor: 'rgba(255, 255, 255, 0.035)',
+                          borderColor: 'rgba(255, 255, 255, 0.07)'
+                        }}
+                      >
+                        <span className="text-[#9CA3AF] font-bold">Transition Pressure:</span>
+                        <span className="font-extrabold px-2.5 py-1 rounded-lg bg-purple-950/60 border border-purple-500/30 text-[#C084FC]">
                           {analysis.transitionPressure}
                         </span>
                       </div>
 
                       {/* Drivers Block */}
                       <div className="space-y-2.5">
-                        <div className="flex items-center gap-1.5 text-xs font-bold text-[#8C94A3] uppercase tracking-wider">
-                          <Info className="w-3.5 h-3.5 text-[#7C3AED]" />
+                        <div className="flex items-center gap-1.5 text-xs font-bold text-[#22D3EE] uppercase tracking-wider">
+                          <Info className="w-3.5 h-3.5 text-[#22D3EE]" />
                           <span>Key Telemetry Drivers</span>
                         </div>
-                        <div className="bg-[#F2F3F7] rounded-xl p-4 border border-[#E4E6EC] space-y-2">
+                        <div 
+                          className="rounded-xl p-4 border space-y-2"
+                          style={{
+                            backgroundColor: 'rgba(255, 255, 255, 0.035)',
+                            borderColor: 'rgba(255, 255, 255, 0.07)'
+                          }}
+                        >
                           {analysis.observations.map((obs, idx) => (
-                            <div key={idx} className="flex items-start gap-2 text-xs text-[#12141A] font-medium font-sans">
-                              <span className="w-1.5 h-1.5 rounded-full bg-[#7C3AED] shrink-0 mt-1.5"></span>
+                            <div key={idx} className="flex items-start gap-2 text-xs text-[#C2C7D2] font-medium font-sans">
+                              <span className="w-1.5 h-1.5 rounded-full bg-[#22D3EE] shrink-0 mt-1.5"></span>
                               <span className="leading-relaxed">{obs}</span>
                             </div>
                           ))}
@@ -548,8 +640,14 @@ export default function MiniAppPage() {
                     </div>
 
                     {/* Disclaimer Note */}
-                    <div className="p-3.5 rounded-xl bg-purple-50/60 border border-purple-200 text-[11px] text-[#5E6675] font-sans leading-relaxed">
-                      <strong>AI Context Engine Notice:</strong> Telemetry outputs are deterministic market context derived from live Binance REST and WebSocket streams. Not financial advice or trade signals.
+                    <div 
+                      className="p-3.5 rounded-xl border text-[11px] text-[#AEB5C3] font-sans leading-relaxed"
+                      style={{
+                        backgroundColor: 'rgba(139, 92, 246, 0.05)',
+                        borderColor: 'rgba(139, 92, 246, 0.20)'
+                      }}
+                    >
+                      <strong className="text-[#C084FC]">AI Context Engine Notice:</strong> Telemetry outputs are deterministic market context derived from live Binance REST and WebSocket streams. Not financial advice or trade signals.
                     </div>
 
                   </div>
