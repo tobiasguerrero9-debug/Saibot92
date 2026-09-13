@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Search, ArrowUpDown, RefreshCw, Star, Layers, CheckCircle2, TrendingUp, TrendingDown } from 'lucide-react';
 import { getMarketUniverse, FEATURED_SYMBOLS } from '../services/marketUniverseService';
+import { classifyAgentState } from '../services/agentStateClassifier';
 
 export default function MarketScanner({ onSelectSymbol, activeSymbol }) {
   const [universe, setUniverse] = useState([]);
@@ -203,6 +204,12 @@ export default function MarketScanner({ onSelectSymbol, activeSymbol }) {
             <tbody className="divide-y divide-white/[0.06] text-[#F8F8FC]">
               {filteredUniverse.slice(0, 50).map((m, idx) => {
                 const isActive = activeSymbol === m.symbol;
+                const agentInfo = classifyAgentState(m);
+                const isSqueeze = agentInfo.state === 'SQUEEZE MODE' || (m.priceChange24h >= 2.0 && m.fundingRate < 0) || (m.priceChange24h <= -2.5 && m.fundingRate > 0.00015);
+                const squeezeLabel = agentInfo.marketBias === 'SHORT SQUEEZE' || (m.priceChange24h >= 2.0 && m.fundingRate < 0)
+                  ? 'SHORT SQUEEZE'
+                  : (m.priceChange24h <= -2.5 ? 'LONG SQUEEZE' : 'SQUEEZE');
+
                 return (
                   <tr
                     key={m.symbol}
@@ -211,8 +218,11 @@ export default function MarketScanner({ onSelectSymbol, activeSymbol }) {
                       isActive
                         ? 'border-l-[3px] border-l-[#7C3AED] font-bold'
                         : idx % 2 === 1 ? 'bg-white/[0.015] hover:bg-white/[0.04]' : 'hover:bg-white/[0.04]'
-                    }`}
-                    style={isActive ? { backgroundColor: 'rgba(124, 58, 237, 0.10)' } : undefined}
+                    } ${isSqueeze && !isActive ? 'border-b-2 border-b-[#7C3AED]' : ''}`}
+                    style={{
+                      ...(isActive ? { backgroundColor: 'rgba(124, 58, 237, 0.10)' } : {}),
+                      ...(isSqueeze && !isActive ? { boxShadow: 'inset 0 -2px 0 rgba(124,58,237,0.35)' } : {})
+                    }}
                   >
                     <td className="py-3.5 px-4 font-extrabold text-[#F8F8FC] flex items-center gap-2">
                       {m.isFeatured ? (
@@ -221,6 +231,11 @@ export default function MarketScanner({ onSelectSymbol, activeSymbol }) {
                         <Star className="w-3.5 h-3.5 text-[#4B5563] shrink-0" />
                       )}
                       <span>{m.symbol}</span>
+                      {isSqueeze && (
+                        <span className="px-1.5 py-0.5 rounded text-[9px] font-bold font-mono uppercase bg-purple-950/60 border border-purple-500/40 text-[#C084FC] shadow-xs shrink-0">
+                          {squeezeLabel}
+                        </span>
+                      )}
                     </td>
 
                     <td className="py-3.5 px-4 font-bold text-[#F8F8FC]">
