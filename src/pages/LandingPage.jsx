@@ -6,6 +6,7 @@ import SectionReads from '../components/SectionReads';
 import SectionAgentExperience from '../components/SectionAgentExperience';
 import SectionChromeCompanion from '../components/SectionChromeCompanion';
 import SectionPurpleContext from '../components/SectionPurpleContext';
+import SectionAugustusAccess from '../components/SectionAugustusAccess';
 import SectionMiniAppPreview from '../components/SectionMiniAppPreview';
 import Footer from '../components/Footer';
 
@@ -20,6 +21,7 @@ export default function LandingPage() {
         <SectionAgentExperience />
         <SectionChromeCompanion />
         <SectionPurpleContext />
+        <SectionAugustusAccess />
         <SectionMiniAppPreview />
       </main>
       <Footer />
