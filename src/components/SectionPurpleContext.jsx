@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const steps = [
   {
@@ -91,6 +92,13 @@ export default function SectionPurpleContext() {
             ))}
           </div>
 
+          <div className="border-t border-white/10 pt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+            <div>
+              <p className="text-xs font-bold tracking-widest text-[#22D3EE]">RESEARCH PROTOCOL</p>
+              <p className="mt-2 text-sm font-sans text-[#AEB5C3]">From historical data to agentic order-flow intelligence.</p>
+            </div>
+            <Link to="/research" className="shrink-0 self-start rounded-lg border border-purple-500/40 px-4 py-3 text-xs font-bold text-[#C084FC] hover:bg-purple-950/50 transition-colors">READ RESEARCH ↗</Link>
+          </div>
         </div>
 
       </div>

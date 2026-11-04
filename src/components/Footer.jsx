@@ -17,8 +17,8 @@ export default function Footer() {
           </Link>
 
           <div className="flex flex-wrap items-center justify-center gap-6 font-semibold uppercase tracking-wider text-xs">
-            <a href="#reads" className="hover:text-[#6D28D9] transition-colors">What it Reads</a>
-            <a href="#context" className="hover:text-[#6D28D9] transition-colors">Methodology</a>
+            <a href="/#reads" className="hover:text-[#6D28D9] transition-colors">What it Reads</a>
+            <a href="/#context" className="hover:text-[#6D28D9] transition-colors">Methodology</a>
             <Link to="/app" className="hover:text-[#6D28D9] transition-colors">Mini App</Link>
             <Link to="/privacy" className="hover:text-[#6D28D9] transition-colors">Privacy Policy</Link>
           </div>
