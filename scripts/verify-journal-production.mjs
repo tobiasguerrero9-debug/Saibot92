@@ -1,0 +1,26 @@
+// Real production HTTP + Neon verification using ephemeral EOA proofs, not address headers.
+// No private keys, cookies or signatures are written to disk or printed.
+import assert from 'node:assert/strict';
+import {randomUUID} from 'node:crypto';
+import {writeFileSync} from 'node:fs';
+import {generatePrivateKey,privateKeyToAccount} from 'viem/accounts';
+const origin='https://www.saibot92.auction';
+class Wallet{
+ constructor(){this.account=privateKeyToAccount(generatePrivateKey());this.cookies={};}
+ async call(route='',body){const url=`${origin}/api/journal${route?'?route='+encodeURIComponent(route):''}`;const r=await fetch(url,{method:body===undefined?'GET':'POST',headers:{Origin:origin,Cookie:Object.entries(this.cookies).map(([k,v])=>`${k}=${v}`).join(';'),...(body===undefined?{}:{'Content-Type':'application/json','X-Journal-CSRF':this.csrf})},body:body===undefined?undefined:JSON.stringify(body),signal:AbortSignal.timeout(30000)});for(const c of r.headers.getSetCookie()){const [n,v]=c.split(';')[0].split('=');this.cookies[n]=v;}return {status:r.status,body:await r.json()};}
+ async connect(){const bootstrap=await this.call('bootstrap');assert.equal(bootstrap.status,200);this.csrf=bootstrap.body.csrf;const challenge=await this.call('challenge',{address:this.account.address});assert.equal(challenge.status,200);const proof={address:this.account.address,...challenge.body,signature:await this.account.signMessage({message:challenge.body.message})};const session=await this.call('session',proof);assert.equal(session.status,200);assert.equal(session.body.wallet,this.account.address.toLowerCase());return proof;}
+}
+const report={status:'RUNNING',origin,browserExtensionQA:'NOT PERFORMED by this script',walletProof:'Real ephemeral EOA signature over server nonce',checks:{}};
+let step='routes',a,b;
+try{
+ for(const path of ['/app','/api/alerts/status','/api/augustus-product/ready']){const r=await fetch(origin+path);assert.equal(r.status,200);if(path.includes('augustus')){const j=await r.json();assert.equal(j.executionEnabled,false);assert.equal(j.persistence,true);}}report.checks.existingRoutes='PASS';
+ a=new Wallet();b=new Wallet();step='wallet proofs';const proof=await a.connect();await b.connect();assert.equal((await a.call('session',proof)).status,401);report.checks.walletIdentityAndReplay='PASS';
+ step='create and context';const raw={requestId:randomUUID(),symbol:'ETHUSDT',marketType:'PERPETUAL',direction:'NO TRADE',resultStatus:'NO TRADE',thesis:'Production QA only: verify journaling infrastructure, no trade or financial execution.',notes:'Production release verification. No order, fill or profit is claimed. Observe the existing market snapshot.',tags:['release-qa']};
+ const made=await a.call('',raw);assert.equal(made.status,201);const retry=await a.call('',raw);assert.equal(retry.body.id,made.body.id);assert.equal(retry.body.duplicate,true);report.journalId=made.body.id;
+ const before=await a.call(made.body.id);assert.equal(before.status,200);assert.equal(before.body.wallet,a.account.address.toLowerCase());assert.equal(before.body.snapshot.server.market?.symbol,'ETHUSDT');assert.ok(before.body.snapshot.capturedAt);report.checks.createSnapshotAndRetry='PASS';report.context={symbol:before.body.snapshot.server.market.symbol,stale:before.body.snapshot.server.stale,alerts:before.body.snapshot.server.alerts.length};
+ step='completion and ledger';const completed=await a.call(`${made.body.id}/complete`,{});assert.equal(completed.status,200);assert.equal(completed.body.awarded,true);assert.equal(completed.body.credits,10);assert.equal((await a.call(`${made.body.id}/complete`,{})).body.awarded,false);report.checks.completeExactlyOnce='PASS';
+ step='reload persistence';const bootstrap=await a.call('bootstrap');assert.equal(bootstrap.body.wallet,a.account.address.toLowerCase());const reloaded=await a.call(made.body.id);assert.equal(reloaded.body.status,'COMPLETED');assert.equal(reloaded.body.compute,10);assert.deepEqual(reloaded.body.snapshot,before.body.snapshot);assert.equal(reloaded.body.analysis.method,'DETERMINISTIC_V1');assert.equal((await a.call('compute')).body.balance,'10');const m=await a.call('memory');assert.equal(m.body.payload.totalJournals,1);assert.ok((await a.call()).body.entries.some(e=>e.id===made.body.id));report.checks.persistedJournalComputeMemoryHistory='PASS';
+ step='wallet isolation';assert.equal((await b.call(made.body.id)).status,404);assert.equal((await b.call(`${made.body.id}/complete`,{})).status,404);assert.equal((await b.call('compute')).body.balance,'0');const anonymous=new Wallet();assert.equal((await anonymous.call()).status,401);report.checks.crossWalletAndAnonymousDenied='PASS';
+ report.status='PASS';report.wallet=a.account.address;report.compute='10';report.memoryJournals=1;
+}catch(error){report.status='FAIL';report.failedStep=step;report.failure=error instanceof assert.AssertionError?{expected:error.expected,actual:error.actual}:'Request did not complete; no secrets logged';process.exitCode=1;}
+finally{try{await a?.call('logout',{});await b?.call('logout',{});}catch{/* Sessions also expire server-side. */}writeFileSync('work/journal-production-verification.local',JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report));}
