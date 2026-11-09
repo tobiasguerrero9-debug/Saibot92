@@ -4,12 +4,31 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "augustus:server": "node --env-file-if-exists=server/augustus/.env.local server/augustus/index.js",
+    "test:augustus": "node --test tests/augustus/*.test.js",
+    "check:augustus:testnet": "node scripts/check-augustus-testnet.mjs",
     "dev": "vite",
     "build": "vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "augustus:hosted:check": "node scripts/check-augustus-hosted-readiness.mjs",
+    "augustus:hosted:migrate": "node scripts/migrate-augustus-hosted.mjs --apply",
+    "augustus:hosted:worker": "node scripts/run-augustus-hosted-worker.mjs",
+    "augustus:protection:worker": "node scripts/run-augustus-protection-worker.mjs",
+    "test:alerts": "node --test tests/alerts/*.test.js",
+    "alerts:worker": "node scripts/run-alerts-worker.mjs",
+    "alerts:worker:local": "node scripts/run-alerts-worker.mjs --local",
+    "alerts:api:local": "node scripts/serve-alerts-local.mjs",
+    "alerts:migrate": "node scripts/migrate-alerts.mjs --apply",
+    "test": "node --test tests/alerts/*.test.js tests/augustus/*.test.js tests/journal/domain.test.js",
+    "test:journal:db": "node --test tests/journal/integration.test.js",
+    "test:journal:ui": "vite build --ssr src/components/Journal.jsx --outDir work/journal-ui && node --test tests/journal/ui.test.js",
+    "journal:migrate": "node scripts/migrate-journal.mjs --apply"
   },
   "dependencies": {
+    "@metamask/eth-sig-util": "9.0.0",
+    "@neondatabase/serverless": "1.2.0",
+    "@nktkas/hyperliquid": "^0.33.3",
     "@tailwindcss/postcss": "^4.3.3",
     "autoprefixer": "^10.5.4",
     "canvas-confetti": "^1.9.4",
@@ -22,7 +41,8 @@
     "react-router-dom": "^7.18.1",
     "recharts": "^3.10.1",
     "tailwind-merge": "^3.6.0",
-    "tailwindcss": "^4.3.3"
+    "tailwindcss": "^4.3.3",
+    "viem": "^2.57.16"
   },
   "devDependencies": {
     "@types/react": "^19.2.17",
@@ -31,5 +51,8 @@
     "oxlint": "^1.71.0",
     "pngjs": "^7.0.0",
     "vite": "^8.1.1"
+  },
+  "engines": {
+    "node": "22.x"
   }
 }

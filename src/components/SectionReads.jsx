@@ -4,7 +4,7 @@ const readsData = [
   {
     number: '01',
     title: 'Order Flow Velocity',
-    detail: 'Aggressive taker buy vs sell volume imbalance across Binance USD-M futures order books to detect institutional absorption.',
+    detail: 'Aggressive taker buy vs sell volume imbalance across public USD-M futures order books to detect institutional absorption.',
     badge: 'TAKER VOLUME',
   },
   {

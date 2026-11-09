@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useSyncExternalStore } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   ArrowLeft, 
@@ -28,11 +28,17 @@ import MarketScanner from '../components/MarketScanner';
 import MainChartSection from '../components/MainChartSection';
 import WhatChangedBlock from '../components/WhatChangedBlock';
 import WebMarketSearch from '../components/WebMarketSearch';
+import AlertsDrawer from '../components/AlertsDrawer';
+import { alertsInbox } from '../services/alertsInbox';
+const Journal=React.lazy(()=>import('../components/Journal'));
+import {buildJournalContext} from '../services/journalContext';
 
 const TIMEFRAMES = ['5m', '15m', '1h'];
 
 export default function MiniAppPage() {
   const navigate = useNavigate();
+  const marketSnapshot = useSyncExternalStore(alertsInbox.subscribe, alertsInbox.marketSnapshot);
+  useEffect(() => alertsInbox.start(), []);
   const [selectedSymbol, setSelectedSymbol] = useState('BTCUSDT');
   const [selectedTimeframe, setSelectedTimeframe] = useState('15m');
   const [symbolSearchInput, setSymbolSearchInput] = useState('');
@@ -97,7 +103,7 @@ export default function MiniAppPage() {
                   SAIBOT92 <span className="text-[#7C3AED]">/ INTELLIGENCE LAYER</span>
                 </span>
                 <span className="text-[10px] font-mono text-[#8C94A3] block -mt-1 uppercase tracking-wider">
-                  BINANCE USD-M FUTURES TELEMETRY
+                  PUBLIC USD-M FUTURES TELEMETRY
                 </span>
               </div>
             </div>
@@ -105,12 +111,13 @@ export default function MiniAppPage() {
 
           {/* Connection Status & Refresh Controls */}
           <div className="flex items-center gap-3 font-mono text-xs">
+            <AlertsDrawer monitor={marketSnapshot} />
             
             {/* Live Connection Badge */}
             {connectionState === 'CONNECTED' && !isStale && (
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[#10B981] font-bold shadow-xs">
                 <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse"></span>
-                <span>LIVE BINANCE</span>
+                <span>PUBLIC USD-M FUTURES TELEMETRY</span>
               </span>
             )}
 
@@ -193,7 +200,7 @@ export default function MiniAppPage() {
             </div>
 
             {/* View Switcher Tabs */}
-            <div className="flex items-center space-x-1 bg-[#13111A] p-1 rounded-xl border border-white/10">
+            <div className="flex flex-wrap items-center gap-1 bg-[#13111A] p-1 rounded-xl border border-white/10">
               <button
                 onClick={() => setActiveTab('intelligence')}
                 className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
@@ -214,6 +221,7 @@ export default function MiniAppPage() {
               >
                 Market Scanner
               </button>
+              <button onClick={()=>setActiveTab('journal')} className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab==='journal'?'bg-[#7C3AED] text-white':'text-[#9CA3AF] hover:text-[#F8F8FC]'}`}>JOURNAL</button>
             </div>
 
           </div>
@@ -251,10 +259,13 @@ export default function MiniAppPage() {
 
         </div>
 
+        {activeTab==='journal'&&<React.Suspense fallback={<p className="font-mono text-sm">Loading Journal…</p>}><Journal context={buildJournalContext({symbol:selectedSymbol,timeframe:selectedTimeframe,marketData,agentState:agentStateInfo,whatChanged,orderFlow:orderFlowInfo,analysis,alerts:alertsInbox.snapshot(),conditions:alertsInbox.liveSnapshot(),connectionState,isStale})}/></React.Suspense>}
         {/* VIEW 2: MARKET SCANNER */}
         {activeTab === 'scanner' && (
           <MarketScanner
             activeSymbol={selectedSymbol}
+            marketSnapshot={marketSnapshot}
+            onRefresh={alertsInbox.refresh}
             onSelectSymbol={(sym) => {
               handleSymbolChange(sym);
               setActiveTab('intelligence');
@@ -269,7 +280,7 @@ export default function MiniAppPage() {
             {connectionState === 'LOADING' && !marketData && (
               <div className="bg-[#101116] rounded-2xl p-16 text-center space-y-4 border border-purple-500/30 text-[#F8F8FC] font-mono">
                 <RefreshCw className="w-8 h-8 text-[#C084FC] animate-spin mx-auto" />
-                <h3 className="text-lg font-bold text-[#F8F8FC]">Connecting to Binance USD-M Futures Stream...</h3>
+                <h3 className="text-lg font-bold text-[#F8F8FC]">Connecting to PUBLIC USD-M FUTURES TELEMETRY...</h3>
                 <p className="text-xs text-[#AEB5C3]">Fetching public REST snapshot & subscribing to WebSockets for {selectedSymbol}</p>
               </div>
             )}
@@ -278,7 +289,7 @@ export default function MiniAppPage() {
             {connectionState === 'OFFLINE' && !marketData && (
               <div className="bg-rose-950/40 rounded-2xl p-12 text-center space-y-4 border border-rose-500/30 text-[#F8F8FC] font-mono">
                 <AlertCircle className="w-10 h-10 text-rose-500 mx-auto" />
-                <h3 className="text-xl font-bold text-rose-200">Public Binance Futures Telemetry Offline</h3>
+                <h3 className="text-xl font-bold text-rose-200">PUBLIC USD-M FUTURES TELEMETRY Offline</h3>
                 <p className="text-sm text-rose-300 max-w-md mx-auto">Unable to reach public REST endpoint. Retrying connection...</p>
                 <button
                   onClick={handleManualRefresh}
@@ -497,7 +508,7 @@ export default function MiniAppPage() {
                       </div>
                     </div>
                     <span className="px-3 py-1 rounded-md bg-purple-50 text-[#7C3AED] border border-purple-200 text-xs font-bold">
-                      {orderFlowInfo.directData.dataBasis}
+                      PUBLIC USD-M FUTURES TELEMETRY
                     </span>
                   </div>
 
@@ -647,7 +658,7 @@ export default function MiniAppPage() {
                         borderColor: 'rgba(139, 92, 246, 0.20)'
                       }}
                     >
-                      <strong className="text-[#C084FC]">AI Context Engine Notice:</strong> Telemetry outputs are deterministic market context derived from live Binance REST and WebSocket streams. Not financial advice or trade signals.
+                      <strong className="text-[#C084FC]">AI Context Engine Notice:</strong> Telemetry outputs are deterministic market context derived from PUBLIC USD-M FUTURES TELEMETRY via live REST and WebSocket streams. Not financial advice or trade signals.
                     </div>
 
                   </div>
@@ -729,3 +740,5 @@ export default function MiniAppPage() {
     </div>
   );
 }
+
+

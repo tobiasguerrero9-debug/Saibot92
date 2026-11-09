@@ -1,0 +1,10 @@
+node_modules
+.git
+.vercel
+dist
+work
+**/.env*
+**/*.local
+**/*.pem
+**/*.key
+**/*private*

@@ -42,7 +42,7 @@ const sections = [
 ];
 
 const layers = [
-  ['REAL MARKET DATA', 'Public Binance prices, OHLCV, open interest, funding and received liquidation events.'],
+  ['REAL MARKET DATA', 'PUBLIC USD-M FUTURES TELEMETRY: prices, OHLCV, open interest, funding and received liquidation events.'],
   ['DERIVED METRICS', 'Calculated USD values, candle-direction participation proxies and relationships between inputs.'],
   ['DETERMINISTIC CLASSIFICATION', 'Explicit rules translate telemetry into market-state labels and contextual scenarios.'],
   ['TEMPORAL MEMORY', 'Recent session observations support comparisons over the available sample window.'],

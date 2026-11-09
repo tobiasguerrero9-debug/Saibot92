@@ -1,0 +1,44 @@
+import React, { useState } from 'react';
+import { useExecutionSession } from '../hooks/useExecutionSession.js';
+import { TOKEN_CHAIN_ID, TOKEN_CONTRACT_ADDRESS, MIN_HOLDER_BALANCE } from '../config.js';
+
+export default function ExecutionSession() {
+  const app = useExecutionSession();
+  const [form, setForm] = useState({ symbol: 'ETH', direction: 'LONG_ONLY', maxPositionUsd: '100', maxLeverage: '1', lossUnit: 'USD', maxLoss: '1', stopLoss: '', takeProfit: '', durationMinutes: '30', maxTrades: 1 });
+  const [dirty, setDirty] = useState(true), [approved, setApproved] = useState(false), [closeConfirmed, setCloseConfirmed] = useState(false);
+  const session = app.data?.session, decision = app.data?.decision;
+  const active = !!session?.armed || ['PLACING_ORDER', 'ORDER_OPEN', 'POSITION_OPEN', 'MANAGING', 'EXITING'].includes(session?.state);
+  const edit = (key, value) => { setForm(current => ({ ...current, [key]: value })); setDirty(true); setApproved(false); };
+  return <>
+    <div className="aug-title"><p>CONFIGURE → ARM → OBSERVE → EXECUTE → PROTECT → AUDIT</p><h1>AUGUSTUS92 // ETH EXECUTION</h1><p>One ETH-PERP TESTNET trade attempt per session. ARM authorizes execution only inside your envelope.</p></div>
+    {app.error && <p className="aug-warning" role="alert">{app.error}</p>}
+    {!app.access?.granted ? <section className="aug-panel aug-lock"><img src="/augustus92-mascot.png" alt="AUGUSTUS92 mint mascot" width="220" height="220" /><div><h2>AUGUSTUS92 // LOCKED</h2><p>Holder access requires {app.config?.MIN_HOLDER_BALANCE || MIN_HOLDER_BALANCE} whole token on chain {app.config?.TOKEN_CHAIN_ID || TOKEN_CHAIN_ID}, verified with balanceOf() and the contract&apos;s decimals().</p><p className="aug-address">{app.config?.TOKEN_CONTRACT_ADDRESS || TOKEN_CONTRACT_ADDRESS}</p><p className="aug-muted">Connect and sign an authentication challenge. No trading authority is granted until you explicitly ARM a configured session. No private key is requested.</p><button disabled={app.busy || !app.config} onClick={app.connect}>{app.busy ? 'VERIFYING…' : 'CONNECT & VERIFY HOLDER'}</button><p className="aug-muted">Server signing: {app.config?.executionEnabled ? 'TESTNET CONFIGURED; AUTHORIZATION STILL CHECKED AT ARM' : 'DISABLED / AGENT SETUP REQUIRED'}</p></div></section> : <>
+      <section className="aug-panel"><div className="aug-actions"><strong>STATUS: {session?.state === 'IDLE' ? 'DISARMED' : session?.state || 'DISARMED'}</strong><span>ETH-PERP / TESTNET</span><span>Trades: {session?.trades || 0} / 1</span><button onClick={app.disconnect}>DISCONNECT</button></div><p className="aug-address">Verified holder: {app.access.account}</p><p className="aug-muted">Agent public address: {app.config?.agentAddress || 'Not configured'}. No mainnet execution.</p></section>
+      <section className="aug-panel"><h2>EXECUTION SESSION / ETH-PERP</h2>
+        <form onSubmit={async event => { event.preventDefault(); const result = await app.configure(form); if (result) { setDirty(false); setApproved(false); } }}>
+          <div className="aug-grid">
+            <label>Direction<select disabled={active || app.busy} value={form.direction} onChange={e => edit('direction', e.target.value)}><option value="LONG_ONLY">LONG ONLY</option><option value="SHORT_ONLY">SHORT ONLY</option><option value="BOTH">BOTH</option></select></label>
+            <label>Max position ($)<input required type="number" min="10" max="100" step="1" value={form.maxPositionUsd} disabled={active || app.busy} onChange={e => edit('maxPositionUsd', e.target.value)} /></label>
+            <label>Max leverage (hard ceiling 3x)<input required type="number" min="1" max="3" step="1" value={form.maxLeverage} disabled={active || app.busy} onChange={e => edit('maxLeverage', e.target.value)} /></label>
+            <label>Max loss unit<select value={form.lossUnit} disabled={active || app.busy} onChange={e => edit('lossUnit', e.target.value)}><option value="USD">USD</option><option value="PERCENT">% equity</option></select></label>
+            <label>Max loss ({form.lossUnit === 'USD' ? '$' : '%'})<input required type="number" min="0.01" step="0.01" max={form.lossUnit === 'USD' ? '5' : '0.5'} value={form.maxLoss} disabled={active || app.busy} onChange={e => edit('maxLoss', e.target.value)} /></label>
+            <label>Protective stop price (required)<input required type="number" min="0.01" step="any" value={form.stopLoss} disabled={active || app.busy} onChange={e => edit('stopLoss', e.target.value)} /></label>
+            <label>Take profit price (optional)<input type="number" min="0.01" step="any" value={form.takeProfit} disabled={active || app.busy} onChange={e => edit('takeProfit', e.target.value)} /></label>
+            <label>Duration<select value={form.durationMinutes} disabled={active || app.busy} onChange={e => edit('durationMinutes', e.target.value)}><option value="30">30m</option><option value="60">1h</option><option value="120">2h</option></select></label>
+            <label>Max trade attempts<input value="1" readOnly /></label>
+          </div><p className="aug-muted">Actual size is risk-based, floored to exchange precision, and capped by margin and your max size. Loss budget is capped at the lower of your limit, $5 and 0.5% of equity at ARM. Stops can slip.</p>
+          <button disabled={active || app.busy} type="submit">CONFIGURE SESSION</button>
+        </form>
+        {session?.config && <p className="aug-muted">SERVER ENVELOPE: {session.config.direction} · ${session.config.maxPositionUsd} max · {session.config.maxLeverage}x · stop {session.config.stopLoss} · {session.config.durationMinutes}m · 1 attempt{session.lossBudgetUsd ? ` · armed loss budget $${session.lossBudgetUsd.toFixed(2)}` : ''}</p>}
+        <label className="aug-confirm"><input type="checkbox" checked={approved} disabled={active || dirty || app.busy} onChange={e => setApproved(e.target.checked)} />I authorize one ETH TESTNET entry and protective/emergency actions within this server envelope.</label>
+        <div className="aug-actions"><button disabled={app.busy || dirty || !approved || session?.state !== 'CONFIGURED' || !app.config?.executionEnabled} onClick={app.arm}>ARM AUGUSTUS</button><button disabled={!session?.owner} onClick={app.stop}>STOP AUGUSTUS</button></div>
+        <p className="aug-muted">STOP prevents new entries, cancels pending entries and preserves confirmed SL. Browser disconnect/heartbeat expiry stops new decisions. Protection failure triggers a reduce-only emergency exit.</p>
+      </section>
+      <section className="aug-panel" aria-live="polite"><h2>CURRENT DECISION / {decision?.decision || 'WAIT'}</h2><p>{decision?.reason || 'Configure and ARM before evaluation.'}</p><p className="aug-muted">ETH WebSocket: {app.data?.websocket?.status || 'DISCONNECTED'}. Decisions are explicit rules using real SAIBOT92 telemetry; derived order flow is a candle-direction proxy.</p>{app.data?.marketContext && <p className="aug-muted">{app.data.marketContext.agentState} · {app.data.marketContext.marketBias} · context score {app.data.marketContext.contextScore} · {app.data.marketContext.transitionPressure}</p>}
+        {app.data?.exchange?.position && <><h3>EXCHANGE POSITION</h3><dl className="aug-grid">{[['Size', app.data.exchange.position.szi], ['Entry', app.data.exchange.position.entryPx], ['Mark', app.data.exchange.market.markPx], ['Unrealized PnL', app.data.exchange.position.unrealizedPnl], ['Leverage', app.data.exchange.position.leverage?.value]].map(([key, value]) => <div key={key}><dt>{key}</dt><dd>{value ?? 'Unavailable'}</dd></div>)}</dl><label className="aug-confirm"><input type="checkbox" checked={closeConfirmed} onChange={e => setCloseConfirmed(e.target.checked)} />Confirm immediate reduce-only close.</label><button disabled={!closeConfirmed || app.busy} onClick={async () => { await app.closeNow(); setCloseConfirmed(false); }}>CLOSE POSITION NOW</button></>}
+        {app.data?.devForceEnabled && <div className="aug-warning"><p>DEVELOPMENT ONLY: override eligibility, not live-data/risk/ARM checks.</p><div className="aug-actions"><button disabled={!active || app.busy} onClick={() => app.force('LONG')}>DEV FORCE LONG ELIGIBLE</button><button disabled={!active || app.busy} onClick={() => app.force('SHORT')}>DEV FORCE SHORT ELIGIBLE</button></div></div>}
+      </section>
+      <section className="aug-panel"><h2>WHY DID AUGUSTUS TRADE? / AUDIT</h2><p className="aug-muted">Persisted server events; not performance history. Full context and exchange reconciliation are attached to each event.</p><div className="aug-audit">{app.data?.events?.filter(event => event.action !== 'CHECKPOINT').slice(-60).reverse().map((event, index) => <details key={index}><summary>{new Date(event.timestamp).toLocaleTimeString()} · {event.action} · {event.reason}</summary><pre>{JSON.stringify(event, null, 2)}</pre></details>)}</div></section>
+    </>}
+  </>;
+}

@@ -1,37 +1,16 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Search, ArrowUpDown, RefreshCw, Star, Layers, CheckCircle2, TrendingUp, TrendingDown } from 'lucide-react';
-import { getMarketUniverse, FEATURED_SYMBOLS } from '../services/marketUniverseService';
-import { classifyAgentState } from '../services/agentStateClassifier';
+import { FEATURED_SYMBOLS } from '../services/marketUniverseService';
 
-export default function MarketScanner({ onSelectSymbol, activeSymbol }) {
-  const [universe, setUniverse] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
+export default function MarketScanner({ onSelectSymbol, activeSymbol, marketSnapshot, onRefresh }) {
+  const universe = marketSnapshot.markets;
+  const loading = marketSnapshot.loading;
+  const error = marketSnapshot.error;
   const [searchQuery, setSearchQuery] = useState('');
   const [filterMode, setFilterMode] = useState('all');
   const [sortField, setSortField] = useState('quoteVolume24h');
   const [sortAsc, setSortAsc] = useState(false);
-
-  const loadUniverse = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await getMarketUniverse();
-      setUniverse(data);
-    } catch (err) {
-      setError('Failed to fetch Binance USD-M Futures market universe.');
-      setUniverse([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadUniverse();
-    const interval = setInterval(loadUniverse, 30000);
-    return () => clearInterval(interval);
-  }, []);
+  const loadUniverse = onRefresh;
 
   const handleSort = (field) => {
     if (sortField === field) {
@@ -81,7 +60,7 @@ export default function MarketScanner({ onSelectSymbol, activeSymbol }) {
               <Layers className="w-4 h-4 text-[#C084FC]" />
             </span>
             <h3 className="text-xl font-extrabold text-[#F8F8FC] tracking-tight font-mono">
-              Binance Futures Market Scanner
+              Public USD-M Futures Market Scanner
             </h3>
             <span className="text-xs font-mono font-semibold px-2.5 py-0.5 rounded-md bg-purple-950/40 border border-purple-500/30 text-[#C084FC]">
               {universe.length} Contracts Active
@@ -157,7 +136,7 @@ export default function MarketScanner({ onSelectSymbol, activeSymbol }) {
       {loading && universe.length === 0 && (
         <div className="py-14 text-center text-[#AEB5C3] space-y-3 font-mono text-xs">
           <RefreshCw className="w-6 h-6 text-[#C084FC] animate-spin mx-auto" />
-          <p>Scanning active Binance USD-M perpetual contracts...</p>
+          <p>Scanning active public USD-M perpetual contracts...</p>
         </div>
       )}
 
@@ -204,7 +183,7 @@ export default function MarketScanner({ onSelectSymbol, activeSymbol }) {
             <tbody className="divide-y divide-white/[0.06] text-[#F8F8FC]">
               {filteredUniverse.slice(0, 50).map((m, idx) => {
                 const isActive = activeSymbol === m.symbol;
-                const agentInfo = classifyAgentState(m);
+                const agentInfo = m.agentInfo;
                 const isSqueeze = agentInfo.state === 'SQUEEZE MODE' || (m.priceChange24h >= 2.0 && m.fundingRate < 0) || (m.priceChange24h <= -2.5 && m.fundingRate > 0.00015);
                 const squeezeLabel = agentInfo.marketBias === 'SHORT SQUEEZE' || (m.priceChange24h >= 2.0 && m.fundingRate < 0)
                   ? 'SHORT SQUEEZE'

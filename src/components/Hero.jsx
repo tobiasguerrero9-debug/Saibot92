@@ -85,10 +85,10 @@ export default function Hero() {
               </Link>
 
               <a
-                href="#augustus92"
+                href="/augustus"
                 className="px-6 py-4 rounded-xl bg-[#0F1015] hover:bg-[#15121D] text-[#2FE7CF] border border-[#2FE7CF]/50 font-bold text-sm uppercase tracking-wider transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2FE7CF]"
               >
-                AUGUSTUS92 UNLOCK
+                AUGUSTUS92
               </a>
 
               <a

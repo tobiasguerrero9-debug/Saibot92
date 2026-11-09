@@ -9,8 +9,8 @@ const BASE_URL = 'https://fapi.binance.com/fapi/v1';
 /**
  * Fetch exchange metadata to discover all trading USDT perpetual contracts.
  */
-export async function fetchExchangeInfo() {
-  const response = await fetch(`${BASE_URL}/exchangeInfo`);
+export async function fetchExchangeInfo(options = {}) {
+  const response = await fetch(`${BASE_URL}/exchangeInfo`, { signal: options.signal });
   if (!response.ok) {
     throw new Error(`HTTP error ${response.status} fetching exchangeInfo`);
   }
@@ -26,11 +26,11 @@ export async function fetchExchangeInfo() {
 /**
  * Fetch 24h ticker statistics for all symbols or a single symbol.
  */
-export async function fetchTickers24h(symbol = null) {
+export async function fetchTickers24h(symbol = null, options = {}) {
   const url = symbol
     ? `${BASE_URL}/ticker/24hr?symbol=${symbol.toUpperCase()}`
     : `${BASE_URL}/ticker/24hr`;
-  const response = await fetch(url);
+  const response = await fetch(url, { signal: options.signal });
   if (!response.ok) {
     throw new Error(`HTTP error ${response.status} fetching 24hr tickers`);
   }
@@ -40,11 +40,11 @@ export async function fetchTickers24h(symbol = null) {
 /**
  * Fetch funding rate and mark price for all symbols or a single symbol.
  */
-export async function fetchPremiumIndex(symbol = null) {
+export async function fetchPremiumIndex(symbol = null, options = {}) {
   const url = symbol
     ? `${BASE_URL}/premiumIndex?symbol=${symbol.toUpperCase()}`
     : `${BASE_URL}/premiumIndex`;
-  const response = await fetch(url);
+  const response = await fetch(url, { signal: options.signal });
   if (!response.ok) {
     throw new Error(`HTTP error ${response.status} fetching premiumIndex`);
   }

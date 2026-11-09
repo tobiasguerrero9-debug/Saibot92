@@ -1,0 +1,10 @@
+# Root build context is required for package.json, server and src.
+FROM node:22-alpine
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev
+COPY server ./server
+COPY src ./src
+COPY scripts/run-augustus-hosted-worker.mjs ./scripts/run-augustus-hosted-worker.mjs
+USER node
+CMD ["node", "scripts/run-augustus-hosted-worker.mjs"]

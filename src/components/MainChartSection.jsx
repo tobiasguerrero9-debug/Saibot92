@@ -119,7 +119,7 @@ export default function MainChartSection({ marketData, selectedTimeframe }) {
               </span>
             </div>
             <p className="text-xs text-[#9CA3AF] font-medium mt-0.5">
-              Live Binance USD-M Futures Telemetry
+              PUBLIC USD-M FUTURES TELEMETRY
             </p>
           </div>
         </div>

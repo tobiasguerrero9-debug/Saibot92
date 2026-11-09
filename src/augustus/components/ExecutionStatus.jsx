@@ -1,0 +1,4 @@
+import React from 'react';
+export default function ExecutionStatus({ app }) {
+  return <section className="aug-panel" aria-live="polite"><h2>EXECUTION STATUS / {app.state}</h2><p>{app.result?.status || 'NO ORDER SUBMITTED'}</p>{app.snapshot?.uncertain && <p className="aug-warning">An uncertain submission is blocking new entries. Reconcile orders on Hyperliquid TESTNET; do not retry blindly.</p>}<h3>LOCAL SESSION EXECUTION JOURNAL</h3><p className="aug-muted">A record of requests and returned statuses. This is not performance history.</p>{app.history.length ? <ul>{app.history.map((item, index) => <li key={index}>{new Date(item.timestamp).toLocaleTimeString()} · {item.symbol} · {item.action || item.side} · {item.status} · {item.orderId || 'No verified order ID'}</li>)}</ul> : <p className="aug-muted">No execution requests in this session.</p>}</section>;
+}

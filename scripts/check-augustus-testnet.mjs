@@ -1,0 +1,13 @@
+import { HyperliquidInfoClient } from '../src/augustus/services/hyperliquidInfoClient.js';
+import { createPublicClient, http, parseAbi } from 'viem';
+import { TOKEN_CHAIN_ID, TOKEN_CONTRACT_ADDRESS, TOKEN_RPC_URL } from '../src/augustus/config.js';
+const client = new HyperliquidInfoClient();
+const markets = await client.markets();
+const eth = markets.find(m => m.name === 'ETH');
+if (!eth || Number(eth.markPx) <= 0 || !Number.isFinite(Number(eth.funding))) throw new Error('Invalid ETH TESTNET data.');
+const book = await client.book('ETH');
+if (book.coin !== 'ETH' || !Array.isArray(book.levels)) throw new Error('Invalid ETH TESTNET order book.');
+const rpc = createPublicClient({ transport: http(TOKEN_RPC_URL, { retryCount: 0, timeout: 8000 }) });
+if (await rpc.getChainId() !== TOKEN_CHAIN_ID) throw new Error('Wrong holder RPC chain.');
+const decimals = await rpc.readContract({ address: TOKEN_CONTRACT_ADDRESS, abi: parseAbi(['function decimals() view returns (uint8)']), functionName: 'decimals' });
+console.log(JSON.stringify({ checkedAt: new Date().toISOString(), hyperliquid: 'TESTNET', markets: markets.length, symbol: eth.name, mark: eth.markPx, funding: eth.funding, bookTime: book.time, tokenChain: TOKEN_CHAIN_ID, tokenDecimals: decimals, ordersSubmitted: 0, note: 'Read-only evidence. Holder wallet and funded TESTNET execution still require setup.' }, null, 2));

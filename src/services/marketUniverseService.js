@@ -4,7 +4,7 @@
  * Provides local search and symbol resolution across the full active USDT perpetual universe.
  */
 
-import { fetchExchangeInfo, fetchTickers24h, fetchPremiumIndex } from './binanceRestClient';
+import { fetchExchangeInfo, fetchTickers24h, fetchPremiumIndex } from './binanceRestClient.js';
 
 export const FEATURED_SYMBOLS = ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT', 'XRPUSDT', 'DOGEUSDT'];
 
@@ -90,12 +90,12 @@ export async function resolveSymbol(input) {
 /**
  * Fetch and construct the active market universe list sorted by quote volume.
  */
-export async function getMarketUniverse() {
+export async function getMarketUniverse(options = {}) {
   try {
     const [exchangeSymbols, tickers, premiumIndices] = await Promise.all([
-      fetchExchangeInfo(),
-      fetchTickers24h(),
-      fetchPremiumIndex(),
+      fetchExchangeInfo(options),
+      fetchTickers24h(null, options),
+      fetchPremiumIndex(null, options),
     ]);
 
     // Cache symbols for local search
@@ -139,12 +139,14 @@ export async function getMarketUniverse() {
       })
       .filter((item) => item.price > 0 && item.quoteVolume24h > 1000); // Filter out zero/illiquid items
 
+    if (options.strict && (!universe.length || universe.some(m => !premiumMap.has(m.symbol) || !Number.isFinite(m.fundingRate)))) throw Error('Incomplete batch funding data');
+
     // Sort by 24h Quote Volume descending
     universe.sort((a, b) => b.quoteVolume24h - a.quoteVolume24h);
 
     return universe;
   } catch (error) {
-    console.error('Failed to build market universe:', error);
+    if (!options.signal) console.error('Failed to build market universe:', error);
     throw error;
   }
 }

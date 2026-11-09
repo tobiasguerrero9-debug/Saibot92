@@ -1,10 +1,10 @@
 import React from 'react';
-import { LockKeyhole } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 
 const accessStatus = [
-  ['holder_verification', 'PENDING'],
-  ['token_access', 'INITIALIZING'],
-  ['execution_layer', 'LOCKED'],
+  ['public_monitoring', 'OPEN'],
+  ['account_access', 'WALLET SIGN-IN'],
+  ['trade_approval', 'REQUIRED'],
 ];
 
 export default function SectionAugustusAccess() {
@@ -13,20 +13,20 @@ export default function SectionAugustusAccess() {
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
         <div className="overflow-hidden rounded-[32px] border border-purple-500/30 shadow-[0_12px_32px_rgba(20,15,35,0.12)]" style={{ background: 'linear-gradient(135deg, #0F1015 0%, #15121D 70%, #10201F 100%)' }}>
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 px-6 py-5 sm:px-10 font-mono text-[10px] sm:text-xs font-bold tracking-widest">
-            <span className="text-[#C084FC]">HOLDER GATED ACCESS</span>
-            <span className="inline-flex items-center gap-2 text-[#2FE7CF]"><LockKeyhole aria-hidden="true" className="h-3.5 w-3.5" /> AUGUSTUS92 // LOCKED</span>
+            <span className="text-[#C084FC]">CORE PRODUCT / ETH-PERP</span>
+            <span className="inline-flex items-center gap-2 text-[#2FE7CF]"><ArrowUpRight aria-hidden="true" className="h-3.5 w-3.5" /> AUGUSTUS92 // OPEN ACCESS</span>
           </div>
 
           <div className="grid lg:grid-cols-[1.15fr_1fr]">
             <div className="p-6 sm:p-10 lg:p-12">
-              <p className="font-mono text-[10px] font-bold tracking-widest text-[#AEB5C3]">FUTURE MODULE / PERPETUAL MARKETS</p>
+              <p className="font-mono text-[10px] font-bold tracking-widest text-[#AEB5C3]">HYPERLIQUID / PERPETUAL MARKETS</p>
               <h2 id="augustus92-title" className="mt-4 font-mono text-4xl sm:text-5xl xl:text-6xl font-black tracking-tight text-[#F8F8FC]">AUGUSTUS<span className="text-[#2FE7CF]">92</span></h2>
               <p className="mt-3 text-lg text-[#F8F8FC]">The agentic execution layer.</p>
 
               <div className="mt-7 space-y-4 text-sm sm:text-base leading-relaxed text-[#AEB5C3] max-w-xl">
-                <p><span className="text-[#C084FC]">SAIBOT92 reads the market.</span><br />AUGUSTUS92 is being built to act on it.</p>
-                <p>Access to AUGUSTUS92 will be reserved for SAIBOT92 token holders.</p>
-                <p>The planned holder layer will unlock wallet-verified access to more agentic trading functionality, including future execution workflows built around perpetual markets.</p>
+                <p><span className="text-[#C084FC]">SAIBOT92 reads the market.</span><br />AUGUSTUS92 turns eligible context into proposals you review.</p>
+                <p>Monitor live ETH context without a wallet or token ownership.</p>
+                <p>Connect your wallet to configure risk, authorize your dedicated agent and arm proposal monitoring. Every entry requires your explicit approval.</p>
               </div>
 
               <dl className="mt-8 border-y border-white/10 py-2 font-mono text-[11px] sm:text-xs">
@@ -39,17 +39,17 @@ export default function SectionAugustusAccess() {
               </dl>
 
               <div className="mt-7">
-                <button type="button" disabled aria-describedby="augustus92-availability" className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-5 py-3 font-mono text-xs font-bold tracking-wider text-[#9CA3AF] cursor-not-allowed">
-                  <LockKeyhole aria-hidden="true" className="h-4 w-4" /> UNLOCK WITH TOKEN
-                </button>
-                <p id="augustus92-availability" className="mt-3 text-xs text-[#AEB5C3]">Available after token launch. The token is not live; holder access and execution are not active.</p>
+                <a href="/augustus" aria-describedby="augustus92-availability" className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-5 py-3 font-mono text-xs font-bold tracking-wider text-[#2FE7CF] hover:bg-white/10">
+                  <ArrowUpRight aria-hidden="true" className="h-4 w-4" /> AUGUSTUS92
+                </a>
+                <p id="augustus92-availability" className="mt-3 text-xs text-[#AEB5C3]">Public monitoring is open. Live execution remains disabled until release and account checks pass.</p>
               </div>
             </div>
 
             <div className="flex flex-col border-t lg:border-t-0 lg:border-l border-white/10 bg-black/35">
               <div className="relative flex flex-1 items-center justify-center bg-black p-6 sm:p-8">
                 <img src="/augustus92-mascot.png" alt="AUGUSTUS92 mint mascot" width="1254" height="1254" className="w-full max-w-[420px] h-auto object-contain" />
-                <span className="absolute bottom-5 left-6 sm:left-8 inline-flex items-center gap-2 rounded-md border border-[#2FE7CF]/20 bg-[#0F1015]/90 px-3 py-2 font-mono text-[10px] text-[#2FE7CF]"><LockKeyhole aria-hidden="true" className="h-3 w-3" /> EXECUTION LAYER / LOCKED</span>
+                <span className="absolute bottom-5 left-6 sm:left-8 inline-flex items-center gap-2 rounded-md border border-[#2FE7CF]/20 bg-[#0F1015]/90 px-3 py-2 font-mono text-[10px] text-[#2FE7CF]"><ArrowUpRight aria-hidden="true" className="h-3 w-3" /> EXPLICIT APPROVAL / EVERY TRADE</span>
               </div>
               <div className="p-6 sm:p-8 space-y-5">
                 <div>
@@ -57,9 +57,9 @@ export default function SectionAugustusAccess() {
                   <p className="mt-2 text-xs leading-relaxed text-[#AEB5C3]">Research · Market Scanner · Squeeze detection · What Changed · Futures analytics</p>
                 </div>
                 <div className="border-t border-white/10 pt-5">
-                  <h3 className="font-mono text-[10px] font-bold tracking-widest text-[#2FE7CF]">COMING / AUGUSTUS92</h3>
-                  <p className="mt-2 text-xs leading-relaxed text-[#AEB5C3]">Token holder verification · AUGUSTUS92 unlock · Agentic execution</p>
-                  <p className="mt-3 font-mono text-[10px] leading-relaxed text-[#AEB5C3]">Hyperliquid execution integration planned.</p>
+                  <h3 className="font-mono text-[10px] font-bold tracking-widest text-[#2FE7CF]">OPEN NOW / AUGUSTUS92</h3>
+                  <p className="mt-2 text-xs leading-relaxed text-[#AEB5C3]">Live ETH context · Dedicated agents · Risk limits · Proposal review</p>
+                  <p className="mt-3 font-mono text-[10px] leading-relaxed text-[#AEB5C3]">ETH-PERP only · Maximum 5× leverage · Mandatory protection.</p>
                 </div>
               </div>
             </div>

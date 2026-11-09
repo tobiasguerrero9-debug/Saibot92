@@ -26,6 +26,7 @@ export default function Navbar() {
           <a href="/#reads" className="hover:text-[#7C3AED] transition-colors">What it Reads</a>
           <a href="/#context" className="hover:text-[#7C3AED] transition-colors">Methodology</a>
           <Link to="/research" className="hover:text-[#7C3AED] transition-colors">Research</Link>
+          <Link to="/augustus" className="hover:text-[#7C3AED] transition-colors">AUGUSTUS92</Link>
           <a href="https://chromewebstore.google.com/detail/saibot92-chrome-companion/loleapnpfgoejneipdfnipiajkechjeg?hl=es" target="_blank" rel="noopener noreferrer" className="hover:text-[#7C3AED] transition-colors">Chrome</a>
           <Link to="/app" className="hover:text-[#7C3AED] transition-colors flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse"></span>
@@ -35,6 +36,7 @@ export default function Navbar() {
 
         {/* Action Button */}
         <div className="flex items-center gap-2 sm:gap-4">
+          <Link to="/augustus" className="hidden sm:inline xl:hidden text-xs font-mono font-semibold text-[#5E6675] hover:text-[#7C3AED]">AUGUSTUS92</Link>
           <Link to="/research" className="hidden sm:inline xl:hidden text-xs font-mono font-semibold uppercase text-[#5E6675] hover:text-[#7C3AED]">Research</Link>
           <a href="https://chromewebstore.google.com/detail/saibot92-chrome-companion/loleapnpfgoejneipdfnipiajkechjeg?hl=es" target="_blank" rel="noopener noreferrer" className="hidden sm:inline xl:hidden text-xs font-mono font-semibold uppercase text-[#5E6675] hover:text-[#7C3AED] transition-colors">Chrome</a>
           <a href="https://x.com/SAIBOT92app" target="_blank" rel="noopener noreferrer" aria-label="SAIBOT92 on X (@SAIBOT92app)" className="inline-flex items-center gap-2 rounded-lg px-2 py-2 text-[#5E6675] hover:text-[#7C3AED] focus-visible:outline-2 focus-visible:outline-purple-500 font-mono text-xs">
@@ -54,6 +56,7 @@ export default function Navbar() {
           </Link>
         </div>
         <nav aria-label="Research navigation" className="sm:hidden w-full border-t border-[#E4E6EC] pt-2 text-right">
+          <Link to="/augustus" className="mr-6 font-mono text-xs font-semibold text-[#5E6675] hover:text-[#7C3AED]">AUGUSTUS92</Link>
           <Link to="/research" className="font-mono text-xs font-semibold uppercase tracking-wider text-[#5E6675] hover:text-[#7C3AED]">Research ↗</Link>
           <a href="https://chromewebstore.google.com/detail/saibot92-chrome-companion/loleapnpfgoejneipdfnipiajkechjeg?hl=es" target="_blank" rel="noopener noreferrer" className="ml-6 font-mono text-xs font-semibold uppercase tracking-wider text-[#5E6675] hover:text-[#7C3AED] transition-colors">Chrome ↗</a>
         </nav>

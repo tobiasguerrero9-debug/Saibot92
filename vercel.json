@@ -1,7 +1,108 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "functions": {
+    "api/augustus.js": {
+      "maxDuration": 30
+    },
+    "api/alerts.js": {
+      "maxDuration": 30
+    },
+    "api/journal.js": {
+      "maxDuration": 30
+    }
+  },
+  "daemons": {
+    "augustus-context": {
+      "root": ".",
+      "entrypoint": "Dockerfile.augustus-context",
+      "command": [
+        "node",
+        "scripts/run-augustus-hosted-worker.mjs"
+      ],
+      "instances": {
+        "fra1": 1
+      }
+    },
+    "augustus-protection": {
+      "root": ".",
+      "entrypoint": "Dockerfile.augustus-protection",
+      "command": [
+        "node",
+        "scripts/run-augustus-protection-worker.mjs"
+      ],
+      "instances": {
+        "iad1": 1
+      }
+    },
+    "saibot-alerts": {
+      "root": ".",
+      "entrypoint": "Dockerfile.alerts",
+      "command": [
+        "node",
+        "scripts/run-alerts-worker.mjs"
+      ],
+      "instances": {
+        "fra1": 1
+      }
+    }
+  },
+  "headers": [
+    {
+      "source": "/augustus",
+      "headers": [
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        }
+      ]
+    }
+  ],
   "rewrites": [
-    { "source": "/privacy", "destination": "/index.html" },
-    { "source": "/app", "destination": "/index.html" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    {
+      "source": "/api/journal/:path*",
+      "destination": "/api/journal?route=:path*"
+    },
+    {
+      "source": "/api/memory",
+      "destination": "/api/journal?route=memory"
+    },
+    {
+      "source": "/api/compute",
+      "destination": "/api/journal?route=compute"
+    },
+    {
+      "source": "/api/alerts/:path*",
+      "destination": "/api/alerts?route=:path*"
+    },
+    {
+      "source": "/api/augustus-product/:path*",
+      "destination": "/api/augustus?route=:path*"
+    },
+    {
+      "source": "/api/augustus-canary/:path*",
+      "destination": "/api/augustus?route=diagnostics"
+    },
+    {
+      "source": "/augustus92/canary",
+      "destination": "/api/augustus?route=diagnostics"
+    },
+    {
+      "source": "/privacy",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/app",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/((?!api/).*)",
+      "destination": "/index.html"
+    }
   ]
 }
