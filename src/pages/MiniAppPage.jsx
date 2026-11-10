@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useSyncExternalStore } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,useSearchParams } from 'react-router-dom';
 import { 
   ArrowLeft, 
   RefreshCw, 
@@ -32,6 +32,7 @@ import AlertsDrawer from '../components/AlertsDrawer';
 import { alertsInbox } from '../services/alertsInbox';
 const Journal=React.lazy(()=>import('../components/Journal'));
 import {buildJournalContext} from '../services/journalContext';
+import {miniAppView,miniAppSearch} from '../services/miniAppNavigation';
 
 const TIMEFRAMES = ['5m', '15m', '1h'];
 
@@ -46,7 +47,9 @@ export default function MiniAppPage() {
   const [marketData, setMarketData] = useState(null);
   const [connectionState, setConnectionState] = useState('LOADING');
   const [isStale, setIsStale] = useState(false);
-  const [activeTab, setActiveTab] = useState('intelligence'); // 'intelligence' | 'scanner'
+  const [searchParams,setSearchParams]=useSearchParams();
+  const activeTab=miniAppView(searchParams);
+  const setActiveTab=view=>setSearchParams(current=>miniAppSearch(current,view));
 
   useEffect(() => {
     const unsubscribe = subscriptionManager.subscribeState((data, connState, stale) => {
@@ -203,6 +206,7 @@ export default function MiniAppPage() {
             <div className="flex flex-wrap items-center gap-1 bg-[#13111A] p-1 rounded-xl border border-white/10">
               <button
                 onClick={() => setActiveTab('intelligence')}
+                aria-pressed={activeTab==='intelligence'}
                 className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
                   activeTab === 'intelligence'
                     ? 'bg-[#7C3AED] text-white shadow-xs'
@@ -213,6 +217,7 @@ export default function MiniAppPage() {
               </button>
               <button
                 onClick={() => setActiveTab('scanner')}
+                aria-pressed={activeTab==='scanner'}
                 className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
                   activeTab === 'scanner'
                     ? 'bg-[#7C3AED] text-white shadow-xs'
@@ -221,7 +226,7 @@ export default function MiniAppPage() {
               >
                 Market Scanner
               </button>
-              <button onClick={()=>setActiveTab('journal')} className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab==='journal'?'bg-[#7C3AED] text-white':'text-[#9CA3AF] hover:text-[#F8F8FC]'}`}>JOURNAL</button>
+              <button onClick={()=>setActiveTab('journal')} aria-pressed={activeTab==='journal'} className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab==='journal'?'bg-[#7C3AED] text-white':'text-[#9CA3AF] hover:text-[#F8F8FC]'}`}>JOURNAL</button>
             </div>
 
           </div>
