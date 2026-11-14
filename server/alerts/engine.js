@@ -19,5 +19,5 @@ export function scanSnapshot(previous, markets, now = Date.now(), context = null
 }
 export function publicSnapshot(record, events = [], now = Date.now()) {
   const live = record?.status?.lastScan && now - record.status.lastScan <= 65000;
-  return { events, conditions: live ? record.conditions : [], markets: record?.markets || [], status: { state: live ? record.status.state : 'OFFLINE', lastScan: record?.status?.lastScan || null, marketsEvaluated: record?.status?.marketsEvaluated || 0, lastEvent: record?.status?.lastEvent ? { symbol: record.status.lastEvent.symbol, title: record.status.lastEvent.title, timestamp: record.status.lastEvent.timestamp } : null }, serverTime: now };
+  return { events, conditions: live ? record.conditions || [] : [], markets: record?.markets || [], status: { state: live ? record.status.state : 'OFFLINE', lastScan: record?.status?.lastScan || null, lastAttempt: record?.status?.lastAttempt || null, lastProgress: record?.status?.lastProgress || null, marketsEvaluated: record?.status?.marketsEvaluated || 0, lastEvent: record?.status?.lastEvent ? { symbol: record.status.lastEvent.symbol, title: record.status.lastEvent.title, timestamp: record.status.lastEvent.timestamp } : null }, serverTime: now };
 }

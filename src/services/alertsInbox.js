@@ -13,7 +13,7 @@ export class AlertsInbox {
   acknowledge(id){for(const e of this.events)if(!id||id===e.id)this.readIds.add(e.id);this.readIds=new Set([...this.readIds].slice(-1000));try{this.storage?.setItem('saibot92.alert-read.v2',JSON.stringify([...this.readIds]))}catch{/* Session read state remains. */}this.events=this.events.map(e=>({...e,acknowledged:this.readIds.has(e.id)}));this.notify()}
   refresh = () => {
     if(this.pending)return this.pending;
-    this.pending=Promise.resolve().then(()=>this.fetchImpl('/api/alerts',{signal:AbortSignal.timeout(12000)})).then(async r=>{if(!r.ok)throw Error();const data=await r.json();if(!Array.isArray(data.events)||!Array.isArray(data.conditions)||!Array.isArray(data.markets))throw Error();
+    this.pending=Promise.resolve().then(()=>this.fetchImpl('/api/alerts?view=inbox',{signal:AbortSignal.timeout(12000)})).then(async r=>{if(!r.ok)throw Error();const data=await r.json();if(!Array.isArray(data.events)||!Array.isArray(data.conditions)||!Array.isArray(data.markets))throw Error();
       this.hasLoaded=true;this.receivedVersion++;this.events=data.events.slice(0,100).map(e=>({...e,acknowledged:this.readIds.has(e.id)}));
       const age=Date.now()-data.serverTime;
       this.conditions=data.conditions.map(e=>({...e,observedAt:e.observedAt+age}));
