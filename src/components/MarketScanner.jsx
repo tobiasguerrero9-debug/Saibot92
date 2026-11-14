@@ -1,16 +1,20 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useSyncExternalStore } from 'react';
 import { Search, ArrowUpDown, RefreshCw, Star, Layers, CheckCircle2, TrendingUp, TrendingDown } from 'lucide-react';
 import { FEATURED_SYMBOLS } from '../services/marketUniverseService';
+import { scannerUniverse } from '../services/scannerUniverse';
 
-export default function MarketScanner({ onSelectSymbol, activeSymbol, marketSnapshot, onRefresh }) {
+export default function MarketScanner({ onSelectSymbol, activeSymbol, hostedMonitor }) {
+  const marketSnapshot = useSyncExternalStore(scannerUniverse.subscribe, scannerUniverse.snapshot, scannerUniverse.snapshot);
+  useEffect(() => scannerUniverse.start(), []);
   const universe = marketSnapshot.markets;
   const loading = marketSnapshot.loading;
   const error = marketSnapshot.error;
+  const countKnown = universe.length > 0 || (!loading && !error);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterMode, setFilterMode] = useState('all');
   const [sortField, setSortField] = useState('quoteVolume24h');
   const [sortAsc, setSortAsc] = useState(false);
-  const loadUniverse = onRefresh;
+  const loadUniverse = scannerUniverse.refresh;
 
   const handleSort = (field) => {
     if (sortField === field) {
@@ -63,7 +67,7 @@ export default function MarketScanner({ onSelectSymbol, activeSymbol, marketSnap
               Public USD-M Futures Market Scanner
             </h3>
             <span className="text-xs font-mono font-semibold px-2.5 py-0.5 rounded-md bg-purple-950/40 border border-purple-500/30 text-[#C084FC]">
-              {universe.length} Contracts Active
+              {countKnown ? `${universe.length} Contracts ${error ? 'Last Observed' : 'Active'}` : loading ? 'Loading contracts' : 'Contract count unavailable'}
             </span>
           </div>
           <p className="text-xs text-[#AEB5C3] font-medium mt-1">
@@ -82,7 +86,7 @@ export default function MarketScanner({ onSelectSymbol, activeSymbol, marketSnap
                   : 'text-[#9CA3AF] hover:text-[#F8F8FC]'
               }`}
             >
-              All Markets ({universe.length})
+              All Markets ({countKnown ? universe.length : '—'})
             </button>
             <button
               onClick={() => setFilterMode('featured')}
@@ -141,6 +145,9 @@ export default function MarketScanner({ onSelectSymbol, activeSymbol, marketSnap
       )}
 
       {/* Error State */}
+      {hostedMonitor?.error && (
+        <p role="status" className="text-xs text-[#AEB5C3] font-mono">Background Alerts monitoring unavailable or delayed. Scanner market data runs independently.</p>
+      )}
       {error && (
         <div className="p-5 rounded-2xl bg-rose-950/40 border border-rose-500/30 text-rose-200 text-xs font-medium text-center space-y-3 font-mono">
           <p>{error}</p>

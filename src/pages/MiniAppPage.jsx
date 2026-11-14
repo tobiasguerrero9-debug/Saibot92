@@ -269,8 +269,7 @@ export default function MiniAppPage() {
         {activeTab === 'scanner' && (
           <MarketScanner
             activeSymbol={selectedSymbol}
-            marketSnapshot={marketSnapshot}
-            onRefresh={alertsInbox.refresh}
+            hostedMonitor={marketSnapshot}
             onSelectSymbol={(sym) => {
               handleSymbolChange(sym);
               setActiveTab('intelligence');
