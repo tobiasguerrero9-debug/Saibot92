@@ -30,6 +30,7 @@ import WhatChangedBlock from '../components/WhatChangedBlock';
 import WebMarketSearch from '../components/WebMarketSearch';
 import AlertsDrawer from '../components/AlertsDrawer';
 import { alertsInbox } from '../services/alertsInbox';
+import { liquidityStressClient } from '../services/liquidityStressClient.js';
 const Journal=React.lazy(()=>import('../components/Journal'));
 const LiquidityStress=React.lazy(()=>import('../components/LiquidityStress'));
 import {buildJournalContext} from '../services/journalContext';
@@ -39,6 +40,7 @@ const TIMEFRAMES = ['5m', '15m', '1h'];
 
 export default function MiniAppPage() {
   const navigate = useNavigate();
+  useEffect(()=>()=>liquidityStressClient.shutdown(),[]);
   const marketSnapshot = useSyncExternalStore(alertsInbox.subscribe, alertsInbox.marketSnapshot);
   useEffect(() => alertsInbox.start(), []);
   const [selectedSymbol, setSelectedSymbol] = useState('BTCUSDT');

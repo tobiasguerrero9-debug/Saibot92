@@ -1,4 +1,4 @@
-export const STRESS_MODEL = Object.freeze({ version: 'LSM-1.0.0', weights: Object.freeze({ oi: .25, liquidation: .25, volatility: .20, book: .30 }), stepMs: 30000, minBaseline: 20, bandBps: 5, freshMs: 65000 });
+export const STRESS_MODEL = Object.freeze({ version: 'LSM-1.0.1', weights: Object.freeze({ oi: .25, liquidation: .25, volatility: .20, book: .30 }), stepMs: 30000, minBaseline: 20, bandBps: 5, freshMs: 65000 });
 export const STRESS_WINDOWS = { '15m': 900000, '1h': 3600000 };
 export const FACTOR_NAMES = { oi: 'OI Instability', liquidation: 'Liquidation Intensity', volatility: 'Volatility Shock', book: 'Order Book Fragility' };
 const finite = n => Number.isFinite(n);
@@ -58,14 +58,18 @@ export function observedFactors(history,timeframe,now=Date.now()) {
   for(let end=earlier.length;end>=n&&liqReference.length<120;end--){const slice=earlier.slice(end-n,end);if(complete(slice,n,'liquidation'))liqReference.push(slice.reduce((s,r)=>s+r.liquidationUsd,0));}
   const liqValid=fresh&&complete(current,n,'liquidation');
   const liquidation=factor(liqValid?current.reduce((s,r)=>s+r.liquidationUsd,0):null,'Observed forceOrder last fills; sampled stream, NOT total exchange liquidations',last?.t,liqReference,'USDT',!fresh?'STALE / NO OBSERVATIONS':!liqValid?'INCOMPLETE STREAM COVERAGE':null);
-  const oldBooks=earlier.filter(r=>complete([r],1,'book')).map(r=>r.book),bookValid=fresh&&complete(current,n,'book');
+  const oldBooks=[...new Map(earlier.filter(r=>complete([r],1,'book')).map(r=>[r.book.observedAt??r.t,r.book])).values()],bookValid=fresh&&complete(current,n,'book');
   let book=factor(null,'Binance depth; window average, ±5 bps band',last?.t,[],'profile',!fresh?'STALE / NO OBSERVATIONS':'INSUFFICIENT BOOK HISTORY');
   if(bookValid&&oldBooks.length>=STRESS_MODEL.minBaseline){
     const spread=mean(current.map(r=>r.book.spreadBps)),depth=mean(current.map(r=>r.book.depthUsd));
     const spreadBasis=normalizeStress(spread,oldBooks.map(b=>b.spreadBps)),depthBasis=normalizeStress(-Math.log(depth),oldBooks.map(b=>-Math.log(b.depthUsd)));
     book={value:depth,unit:'USDT in band',source:'Binance depth; window average, ±5 bps band',observedAt:last.t,validity:'VALID',score:Math.round(.4*spreadBasis.score+.6*depthBasis.score),normalization:{method:'40% relative spread stress + 60% relative depth loss; own-market ranks',samples:oldBooks.length},metrics:{spreadBps:spread,depthUsd:depth,bidUsd:mean(current.map(r=>r.book.bidUsd)),askUsd:mean(current.map(r=>r.book.askUsd)),imbalance:mean(current.map(r=>r.book.imbalance)),depthDeteriorationPct:100*(1-depth/median(oldBooks.map(b=>b.depthUsd)))}};
   }
-  return {liquidation,book,coverage:{samples:rows.length,requiredCurrentSamples:n,baselineWindows:liqReference.length,scope:'This browser only; gaps invalidate windows',warmupMinutes:2*w/60000+STRESS_MODEL.minBaseline/2}};
+  const progress=(kind,baseline,valid)=>{let tail=0;for(let i=rows.length-1;i>=0;i--){if(!complete([rows[i]],1,kind)||(i<rows.length-1&&rows[i+1].t-rows[i].t!==STRESS_MODEL.stepMs))break;tail++;}
+    const count=current.filter(r=>complete([r],1,kind)).length,required=kind==='liquidation'?2*n+STRESS_MODEL.minBaseline-1:n+STRESS_MODEL.minBaseline;
+    const remaining=valid?0:Math.max(1,(baseline>=STRESS_MODEL.minBaseline?n:required)-tail);
+    return {currentSamples:count,requiredCurrentSamples:n,baselineSamples:baseline,requiredBaselineSamples:STRESS_MODEL.minBaseline,consecutiveSamples:tail,requiredTotalSamples:required,coveragePercent:Math.round(100*count/n),remainingSeconds:remaining*STRESS_MODEL.stepMs/1000,lastValidAt:(()=>{const r=[...rows].reverse().find(r=>complete([r],1,kind));return (kind==='book'?r?.book?.observedAt:r?.t)??null})()};};
+  return {liquidation,book,coverage:{samples:rows.length,requiredCurrentSamples:n,baselineWindows:liqReference.length,scope:'This browser only; gaps invalidate windows',warmupMinutes:2*w/60000+(STRESS_MODEL.minBaseline-1)/2,liquidation:progress('liquidation',liqReference.length,liquidation.validity==='VALID'),book:progress('book',oldBooks.length,book.validity==='VALID')}};
 }
 export function compositeStress(factors,config=STRESS_MODEL) {
   const keys=Object.keys(FACTOR_NAMES),weights=config.weights;
