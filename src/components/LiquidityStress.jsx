@@ -1,0 +1,30 @@
+import React, { useEffect, useSyncExternalStore } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import WebMarketSearch from './WebMarketSearch';
+import { liquidityStressClient } from '../services/liquidityStressClient.js';
+import { FACTOR_NAMES, STRESS_MODEL } from '../services/liquidityStressModel.js';
+import './liquidityStress.css';
+const number=(n,d=2)=>Number.isFinite(n)?n.toLocaleString(undefined,{maximumFractionDigits:d}):'—';
+const time=t=>Number.isFinite(t)?new Date(t).toLocaleTimeString():'Not observed';
+export function LiquidityStressView({state,symbol,timeframe,onSymbol=()=>{},onTimeframe=()=>{}}) {
+  const s=state.selected;
+  return <section className="lsm" aria-label="Liquidity Stress Monitor">
+    <header className="lsm-heading"><div><p className="lsm-eyebrow">SAIBOT92 / RISK INTELLIGENCE</p><h1>Liquidity stress.</h1><p>Quantify fragility. Understand the observed drivers.</p></div><span className="lsm-version">{STRESS_MODEL.version}</span></header>
+    <div className="lsm-controls"><WebMarketSearch activeSymbol={symbol} onSelectSymbol={onSymbol}/><div role="group" aria-label="Stress timeframe">{['15m','1h'].map(tf=><button key={tf} aria-pressed={tf===timeframe} onClick={()=>onTimeframe(tf)}>{tf}</button>)}</div></div>
+    {state.error&&<p role="alert" className="lsm-error">{state.error}</p>}
+    <section className="lsm-surface lsm-index" aria-label="Live stress index"><div><p className="lsm-eyebrow">LIVE STRESS INDEX / {timeframe}</p><h2>{symbol}</h2><div className="lsm-score">{s?.score??'—'}<span>/100</span></div><strong className="lsm-state">{s?.state||'INSUFFICIENT DATA'}</strong></div><div><p className="lsm-summary">{s?.summary||'Waiting for real observations. Missing measurements are never scored as zero.'}</p><dl><div><dt>Evaluation</dt><dd>{time(s?.evaluatedAt)}</dd></div><div><dt>Snapshot</dt><dd>{time(state.observedAt)}</dd></div><div><dt>Freshness</dt><dd>{state.error?'UNAVAILABLE':state.loading?'LOADING':s?.freshness||'NOT OBSERVED'}</dd></div><div><dt>Full-history warm-up</dt><dd>~{timeframe==='15m'?'40':'130'} minutes, uninterrupted</dd></div></dl><p className="lsm-note">Display bands are provisional conventions, not calibrated risk probabilities or directional predictions.</p></div></section>
+    <section aria-label="Stress drivers"><div className="lsm-section-title"><h2>Stress drivers</h2><span>FIXED WEIGHTS / NO REDISTRIBUTION</span></div><div className="lsm-drivers">{Object.entries(FACTOR_NAMES).map(([key,name])=>{const f=s?.factors?.[key];return <article key={key} className="lsm-surface lsm-driver"><div className="lsm-factor-heading"><h3>{name}</h3><span>{Math.round(STRESS_MODEL.weights[key]*100)}%</span></div><div className="lsm-factor-score">{f?.score??'—'}<small>/100</small></div><p className="lsm-validity">{f?.validity||'INSUFFICIENT DATA'}</p><p className="lsm-measure">{number(f?.value)} <span>{f?.unit||'not measured'}</span></p>{Number.isFinite(f?.score)&&<div className="lsm-bar" aria-label={`${name} score ${f.score}`}><i style={{width:f.score+'%'}}/></div>}<details><summary>Measurement basis</summary><p>{f?.source||'Awaiting source'}</p><p>Observed: {time(f?.observedAt)}</p><p>{f?.normalization?.method||'Own-market history is not yet sufficient for normalization.'}</p><p>Reference samples: {f?.normalization?.samples??0}</p></details></article>})}</div>
+    {s?.book?.valid&&<div className="lsm-book"><span>LAST SNAPSHOT / ±{s.book.bandBps} BPS</span><span>Spread {number(s.book.spreadBps)} bps</span><span>Bid ${number(s.book.bidUsd,0)}</span><span>Ask ${number(s.book.askUsd,0)}</span><span>Imbalance {number(s.book.imbalance*100)}%</span></div>}
+    <p className="lsm-note">Liquidations are observed last fills from a sampled stream, not an exhaustive exchange record. Standard depth excludes RPI orders. One book snapshot does not establish persistent deterioration.</p></section>
+    <section className="lsm-surface" aria-label="Stress watchlist"><div className="lsm-watch-header"><h2>Stress watchlist</h2><p>Top 20 by 24h quote volume. Qualified scores ranked first; unqualified markets retain liquidity order.</p></div><div className="lsm-table-wrap"><table><thead><tr><th>Market</th><th>Stress</th><th>State</th><th>Change</th><th>Freshness</th></tr></thead><tbody>{state.watchlist.map(r=><tr key={r.symbol} data-selected={r.symbol===symbol}><td><button onClick={()=>onSymbol(r.symbol)}>{r.symbol}</button></td><td className="lsm-table-score">{r.score??'—'}</td><td>{r.state}</td><td title="Versus previous qualified evaluation of this timeframe">{r.delta===null?'—':`${r.delta>0?'+':''}${r.delta}`}</td><td>{r.freshness}</td></tr>)}</tbody></table></div>{!state.watchlist.length&&<p className="lsm-empty">{state.error?'Watchlist unavailable.':'Loading supported markets…'}</p>}</section>
+    <p className="lsm-footnote">History scope: this browser, not a global exchange archive. Disconnects, tab suspension and missing depth invalidate coverage. {state.historyPersistent?'Observed samples are retained locally.':'History is session-only; local storage is unavailable.'} No Neon or Alerts dependency. This descriptive model has not been statistically validated as a volatility predictor.</p>
+  </section>;
+}
+export default function LiquidityStress({initialSymbol='BTCUSDT'}) {
+  const [params,setParams]=useSearchParams(),symbol=params.get('stressSymbol')||initialSymbol,timeframe=params.get('stressWindow')==='1h'?'1h':'15m';
+  const state=useSyncExternalStore(liquidityStressClient.subscribe,liquidityStressClient.snapshot,liquidityStressClient.snapshot);
+  useEffect(()=>liquidityStressClient.start(),[]);
+  useEffect(()=>liquidityStressClient.select(symbol,timeframe),[symbol,timeframe]);
+  const update=(key,value)=>setParams(current=>{const next=new URLSearchParams(current);next.set(key,value);return next});
+  return <LiquidityStressView state={state} symbol={symbol} timeframe={timeframe} onSymbol={s=>update('stressSymbol',s)} onTimeframe={tf=>update('stressWindow',tf)}/>;
+}

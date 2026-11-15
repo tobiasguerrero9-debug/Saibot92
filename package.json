@@ -20,10 +20,13 @@
     "alerts:worker:local": "node scripts/run-alerts-worker.mjs --local",
     "alerts:api:local": "node scripts/serve-alerts-local.mjs",
     "alerts:migrate": "node scripts/migrate-alerts.mjs --apply",
-    "test": "node --test tests/alerts/*.test.js tests/augustus/*.test.js tests/journal/domain.test.js",
+    "test": "node --test tests/alerts/*.test.js tests/augustus/*.test.js tests/journal/domain.test.js tests/liquidityStress/model.test.js tests/liquidityStress/service.test.js",
     "test:journal:db": "node --test tests/journal/integration.test.js",
     "test:journal:ui": "vite build --ssr src/components/Journal.jsx --outDir work/journal-ui && node --test tests/journal/ui.test.js",
-    "journal:migrate": "node scripts/migrate-journal.mjs --apply"
+    "journal:migrate": "node scripts/migrate-journal.mjs --apply",
+    "test:stress": "node --test tests/liquidityStress/model.test.js tests/liquidityStress/service.test.js",
+    "stress:api:local": "node scripts/serve-liquidity-stress.mjs",
+    "test:stress:ui": "vite build --ssr src/components/LiquidityStress.jsx --outDir work/stress-ui && node --test tests/liquidityStress/ui.test.js"
   },
   "dependencies": {
     "@metamask/eth-sig-util": "9.0.0",

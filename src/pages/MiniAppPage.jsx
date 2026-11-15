@@ -31,6 +31,7 @@ import WebMarketSearch from '../components/WebMarketSearch';
 import AlertsDrawer from '../components/AlertsDrawer';
 import { alertsInbox } from '../services/alertsInbox';
 const Journal=React.lazy(()=>import('../components/Journal'));
+const LiquidityStress=React.lazy(()=>import('../components/LiquidityStress'));
 import {buildJournalContext} from '../services/journalContext';
 import {miniAppView,miniAppSearch} from '../services/miniAppNavigation';
 
@@ -227,6 +228,7 @@ export default function MiniAppPage() {
                 Market Scanner
               </button>
               <button onClick={()=>setActiveTab('journal')} aria-pressed={activeTab==='journal'} className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab==='journal'?'bg-[#7C3AED] text-white':'text-[#9CA3AF] hover:text-[#F8F8FC]'}`}>JOURNAL</button>
+              <button onClick={()=>setActiveTab('liquidity-stress')} aria-pressed={activeTab==='liquidity-stress'} className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab==='liquidity-stress'?'bg-[#7C3AED] text-white':'text-[#9CA3AF] hover:text-[#F8F8FC]'}`}>LIQUIDITY STRESS</button>
             </div>
 
           </div>
@@ -265,11 +267,13 @@ export default function MiniAppPage() {
         </div>
 
         {activeTab==='journal'&&<React.Suspense fallback={<p className="font-mono text-sm">Loading Journal…</p>}><Journal context={buildJournalContext({symbol:selectedSymbol,timeframe:selectedTimeframe,marketData,agentState:agentStateInfo,whatChanged,orderFlow:orderFlowInfo,analysis,alerts:alertsInbox.snapshot(),conditions:alertsInbox.liveSnapshot(),connectionState,isStale})}/></React.Suspense>}
+        {activeTab==='liquidity-stress'&&<React.Suspense fallback={<p className="font-mono text-sm">Loading Liquidity Stress…</p>}><LiquidityStress initialSymbol={selectedSymbol}/></React.Suspense>}
         {/* VIEW 2: MARKET SCANNER */}
         {activeTab === 'scanner' && (
           <MarketScanner
             activeSymbol={selectedSymbol}
             hostedMonitor={marketSnapshot}
+            onStress={sym=>setSearchParams(current=>{const next=miniAppSearch(current,'liquidity-stress');next.set('stressSymbol',sym);return next})}
             onSelectSymbol={(sym) => {
               handleSymbolChange(sym);
               setActiveTab('intelligence');

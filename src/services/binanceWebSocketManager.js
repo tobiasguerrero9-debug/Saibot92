@@ -5,7 +5,7 @@
  * and maintains connection status without memory leaks.
  */
 
-const WS_BASE_URL = 'wss://fstream.binance.com/stream?streams=';
+const WS_BASE_URL = 'wss://fstream.binance.com/market/stream?streams=';
 
 export class BinanceWebSocketManager {
   constructor() {
@@ -16,10 +16,17 @@ export class BinanceWebSocketManager {
     this.reconnectTimer = null;
     this.isManualClose = false;
     this.status = 'DISCONNECTED'; // CONNECTING | CONNECTED | RECONNECTING | DISCONNECTED
+    this.observers = new Set();
+  }
+  observe(onMessage, onStatus) {
+    const observer = { onMessage, onStatus }; this.observers.add(observer);
+    try { onStatus?.(this.status); } catch { /* Optional consumers are isolated. */ }
+    return () => this.observers.delete(observer);
   }
 
   setStatus(newStatus) {
     this.status = newStatus;
+    this.observers.forEach(o => { try { o.onStatus?.(newStatus); } catch { /* Never interrupt the primary feed. */ } });
     if (this.onStatusChangeCallback) {
       this.onStatusChangeCallback(newStatus);
     }
@@ -52,6 +59,7 @@ export class BinanceWebSocketManager {
       this.socket.onmessage = (event) => {
         try {
           const payload = JSON.parse(event.data);
+          this.observers.forEach(o => { try { o.onMessage?.(payload.stream, payload.data); } catch { /* Never interrupt the primary feed. */ } });
           // Combined stream format: { stream: "btcusdt@miniTicker", data: {...} }
           if (this.onMessageCallback) {
             this.onMessageCallback(payload.stream, payload.data);

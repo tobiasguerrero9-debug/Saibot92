@@ -1,0 +1,39 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {StressDataService,createStressHandler} from '../../server/liquidityStress/service.js';
+import {LiquidityStressClient} from '../../src/services/liquidityStressClient.js';
+import {BinanceWebSocketManager} from '../../src/services/binanceWebSocketManager.js';
+test('request queue enforces three concurrent operations and coalesces cached requests',async()=>{
+  let active=0,max=0,calls=0;const s=new StressDataService({fetchImpl:async()=>{calls++;active++;max=Math.max(max,active);await new Promise(r=>setTimeout(r,2));active--;return new Response('{}')}});await Promise.all(Array.from({length:12},()=>s.request('/test',1,Date.now()+2000)));assert.equal(max,3);await Promise.all([s.cached('x',5000,async()=>++calls),s.cached('x',5000,async()=>++calls)]);assert.equal(calls,13);
+});
+test('Binance 429/418 triggers shared cooldown without a retry storm',async()=>{
+  for(const status of [429,418]){let calls=0;const s=new StressDataService({fetchImpl:async()=>{calls++;return new Response('{}',{status,headers:{'retry-after':'120'}})}});await assert.rejects(s.request('/test',1,Date.now()+5000),/RATE LIMITED/);await assert.rejects(s.request('/test',1,Date.now()+5000),/RATE LIMITED/);assert.equal(calls,1);}
+});
+test('per-instance weight budget bounds traffic and upstream failures are explicit',async()=>{
+  let calls=0;const s=new StressDataService({budget:2,fetchImpl:async()=>{calls++;return new Response('{}')}});await s.request('/test',2,Date.now()+5000);await assert.rejects(s.request('/test',1,Date.now()+5000),/BUDGET/);assert.equal(calls,1);const failing=new StressDataService({fetchImpl:async()=>new Response('{}',{status:503})});await assert.rejects(failing.request('/test',1,Date.now()+5000),/UNAVAILABLE/);
+});
+test('empty universe and symbol injection return safe errors; POST cannot mutate anything',async()=>{
+  const s=new StressDataService({universe:async()=>[]}),h=createStressHandler(s);for(const [url,method,status] of [['/api/liquidity-stress','GET',503],['/api/liquidity-stress?symbol=../../secret','GET',400],['/api/liquidity-stress','POST',405]]){let body;const res={setHeader(){},end(s){body=s}};await h({url,method},res);assert.equal(res.statusCode,status);assert.ok(!body.includes('secret'));}
+});
+test('optional stream observers cannot break existing consumers and never create a new connection',()=>{
+  const s=new BinanceWebSocketManager();let notified=0;const off=s.observe(()=>{throw Error()},()=>notified++);s.onStatusChangeCallback=()=>notified++;s.setStatus('CONNECTED');assert.equal(notified,3);assert.equal(s.socket,null);off();assert.equal(s.observers.size,0);
+});
+test('liquidation observations use last filled notional, dedupe messages, and invalidate disconnected coverage',()=>{
+  let now=100000;const client=new LiquidityStressClient({clock:()=>now});client.response={markets:[{symbol:'ETHUSDT'}]};client.status('CONNECTED');client.lastPoll=now;client.receive('!forceOrder@arr',{o:{s:'ETHUSDT',S:'SELL',T:now,l:'2',ap:'100',z:'1000'}});client.receive('!forceOrder@arr',{o:{s:'ETHUSDT',S:'SELL',T:now,l:'2',ap:'100',z:'1000'}});assert.equal(client.liquidations.get('ETHUSDT'),200);now+=30000;client.receive('btcusdt@miniTicker',{});client.retain({markets:[{symbol:'ETHUSDT',book:{valid:false}}]});assert.equal(client.histories.get('ETHUSDT')[0].covered,true);client.status('DISCONNECTED');now+=30000;client.retain({markets:[{symbol:'ETHUSDT',book:{valid:false}}]});assert.equal(client.histories.get('ETHUSDT')[1].covered,false);
+});
+test('Stress API failure does not write synthetic scores, Alerts or Scanner state',async()=>{
+  const client=new LiquidityStressClient({fetchImpl:async()=>({ok:false})});await client.refresh();assert.equal(client.snapshot().selected,null);assert.match(client.snapshot().error,/unavailable/);assert.equal(client.histories.size,0);assert.equal(typeof client.observeUniverse,'undefined');
+});
+
+test('exchange clock alignment rejects stale data without rejecting healthy sources on skewed hosts',async()=>{
+ const now=1_800_000_000_000, offset=660000;let calls=0;
+ const s=new StressDataService({clock:()=>now,universe:async()=>[{symbol:'ETHUSDT',price:100,quoteVolume24h:100}],fetchImpl:async url=>{calls++;const path=new URL(url).pathname;return new Response(JSON.stringify(path.endsWith('/time')?{serverTime:now+offset}:path.endsWith('/depth')?{T:now+offset,bids:[[99.99,10],[99,10]],asks:[[100.01,10],[101,10]]}:[]));}});
+ const first=await s.snapshot('ETHUSDT');assert.equal(first.observedAt,now+offset);assert.equal(first.markets[0].book.valid,true);assert.equal(first.markets[0].timeframes['15m'].oi.score,null);await s.snapshot('ETHUSDT');assert.equal(calls,4,'cached snapshots reuse all four upstream sources');
+});
+test('client normalizes stream timestamps against exchange time, not the host clock',()=>{
+ const c=new LiquidityStressClient({clock:()=>100000});c.timeOffset=660000;c.response={markets:[{symbol:'ETHUSDT'}]};c.receive('!forceOrder@arr',{o:{s:'ETHUSDT',T:760000,l:'2',ap:'100'}});assert.equal(c.liquidations.get('ETHUSDT'),200);
+});
+
+test('shared connection uses official market stream route and retains requested subscriptions',()=>{
+ const previous=globalThis.WebSocket;let url;globalThis.WebSocket=class{constructor(value){url=value}close(){}};
+ try{const manager=new BinanceWebSocketManager();manager.connect(['btcusdt@aggTrade','!forceOrder@arr'],()=>{});assert.equal(url,'wss://fstream.binance.com/market/stream?streams=btcusdt@aggTrade/!forceOrder@arr');manager.disconnect();}finally{globalThis.WebSocket=previous}
+});

@@ -1,4 +1,4 @@
-const views=new Set(['intelligence','scanner','journal']);
+const views=new Set(['intelligence','scanner','journal','liquidity-stress']);
 export function miniAppView(search){
   const value=new URLSearchParams(search).get('view');
   return views.has(value)?value:'intelligence';

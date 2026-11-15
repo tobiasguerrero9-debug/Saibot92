@@ -3,7 +3,7 @@ import { Search, ArrowUpDown, RefreshCw, Star, Layers, CheckCircle2, TrendingUp,
 import { FEATURED_SYMBOLS } from '../services/marketUniverseService';
 import { scannerUniverse } from '../services/scannerUniverse';
 
-export default function MarketScanner({ onSelectSymbol, activeSymbol, hostedMonitor }) {
+export default function MarketScanner({ onSelectSymbol, activeSymbol, hostedMonitor, onStress }) {
   const marketSnapshot = useSyncExternalStore(scannerUniverse.subscribe, scannerUniverse.snapshot, scannerUniverse.snapshot);
   useEffect(() => scannerUniverse.start(), []);
   const universe = marketSnapshot.markets;
@@ -256,6 +256,7 @@ export default function MarketScanner({ onSelectSymbol, activeSymbol, hostedMoni
                           SELECT
                         </span>
                       )}
+                      {onStress&&<button aria-label={`Liquidity Stress for ${m.symbol}`} onClick={event=>{event.stopPropagation();onStress(m.symbol)}} className="ml-2 px-2 py-1 text-[10px] font-mono border border-purple-500/30 text-[#C084FC]">STRESS</button>}
                     </td>
                   </tr>
                 );
