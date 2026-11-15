@@ -66,8 +66,8 @@ export function observedFactors(history,timeframe,now=Date.now()) {
     book={value:depth,unit:'USDT in band',source:'Binance depth; window average, ±5 bps band',observedAt:last.t,validity:'VALID',score:Math.round(.4*spreadBasis.score+.6*depthBasis.score),normalization:{method:'40% relative spread stress + 60% relative depth loss; own-market ranks',samples:oldBooks.length},metrics:{spreadBps:spread,depthUsd:depth,bidUsd:mean(current.map(r=>r.book.bidUsd)),askUsd:mean(current.map(r=>r.book.askUsd)),imbalance:mean(current.map(r=>r.book.imbalance)),depthDeteriorationPct:100*(1-depth/median(oldBooks.map(b=>b.depthUsd)))}};
   }
   const progress=(kind,baseline,valid)=>{let tail=0;for(let i=rows.length-1;i>=0;i--){if(!complete([rows[i]],1,kind)||(i<rows.length-1&&rows[i+1].t-rows[i].t!==STRESS_MODEL.stepMs))break;tail++;}
-    const count=current.filter(r=>complete([r],1,kind)).length,required=kind==='liquidation'?2*n+STRESS_MODEL.minBaseline-1:n+STRESS_MODEL.minBaseline;
-    const remaining=valid?0:Math.max(1,(baseline>=STRESS_MODEL.minBaseline?n:required)-tail);
+    const count=current.filter(r=>r.t>last.t-w&&complete([r],1,kind)).length,required=kind==='liquidation'?2*n+STRESS_MODEL.minBaseline-1:n+STRESS_MODEL.minBaseline;
+    const remaining=valid?0:Math.max(1,(baseline>=STRESS_MODEL.minBaseline?n:required)-tail,STRESS_MODEL.minBaseline-baseline);
     return {currentSamples:count,requiredCurrentSamples:n,baselineSamples:baseline,requiredBaselineSamples:STRESS_MODEL.minBaseline,consecutiveSamples:tail,requiredTotalSamples:required,coveragePercent:Math.round(100*count/n),remainingSeconds:remaining*STRESS_MODEL.stepMs/1000,lastValidAt:(()=>{const r=[...rows].reverse().find(r=>complete([r],1,kind));return (kind==='book'?r?.book?.observedAt:r?.t)??null})()};};
   return {liquidation,book,coverage:{samples:rows.length,requiredCurrentSamples:n,baselineWindows:liqReference.length,scope:'This browser only; gaps invalidate windows',warmupMinutes:2*w/60000+(STRESS_MODEL.minBaseline-1)/2,liquidation:progress('liquidation',liqReference.length,liquidation.validity==='VALID'),book:progress('book',oldBooks.length,book.validity==='VALID')}};
 }

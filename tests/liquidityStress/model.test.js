@@ -26,3 +26,7 @@ test('complete retained observation windows yield valid factors; gaps and cold s
 test('ranking uses qualified stress first, then liquidity for unqualified rows',()=>{
   const rows=[{symbol:'A',score:null,quoteVolume24h:100},{symbol:'B',score:20,quoteVolume24h:20},{symbol:'C',score:90,quoteVolume24h:10},{symbol:'D',score:null,quoteVolume24h:200}];assert.deepEqual(rankStress(rows).map(x=>x.symbol),['C','B','D','A']);assert.equal(rows[0].symbol,'A');
 });
+
+test('coverage diagnostics do not count older observations across a missing interval as a full current window',()=>{
+ const missing=history.filter((_r,i)=>i!==390);const r=observedFactors(missing,'15m',now);assert.equal(r.liquidation.score,null);assert.equal(r.book.score,null);assert.equal(r.coverage.liquidation.currentSamples,29);assert.equal(r.coverage.book.coveragePercent,97);
+});
