@@ -53,3 +53,7 @@ test('event-time bucketing deduplicates last fills and does not mix neighboring 
 test('an open socket without the liquidation subscription cannot assert zero-liquidation coverage',()=>{
  let now=1800000000000;const c=new LiquidityStressClient({clock:()=>now,stream:{currentStreams:['btcusdt@miniTicker']}});c.response={observedAt:now,markets:[{symbol:'ETHUSDT',timeframes:{'15m':{},'1h':{}}}],watchlistSymbols:[]};c.ingest(c.response);c.status('CONNECTED');for(let i=0;i<61;i++){now+=1000;c.receive('btcusdt@miniTicker',{});c.retain();}assert.equal(c.histories.get('ETHUSDT').at(-1).covered,false);assert.match(c.snapshot().connection,/SUBSCRIPTION MISSING/);
 });
+
+test('browser quota pressure retries a bounded retained history without deleting records or claiming failed persistence',()=>{
+ const writes=[];const c=new LiquidityStressClient({storage:{setItem:(k,v)=>{writes.push(JSON.parse(v));if(writes.length===1)throw Error('QuotaExceededError')}}});c.histories.set('ETHUSDT',Array.from({length:400},(_,i)=>({t:i})));c.persist();assert.equal(writes[1][0][1].length,260);assert.equal(c.histories.get('ETHUSDT').length,400);assert.equal(c.snapshot().historyPersistent,true);c.storage={setItem:()=>{throw Error('QuotaExceededError')}};c.persist();assert.equal(c.snapshot().historyPersistent,false);
+});

@@ -48,16 +48,22 @@ export class LiquidityStressClient {
         const rows=this.histories.get(m.symbol)||[];
         const b=(this.books.get(m.symbol)||[]).filter(b=>b.observedAt<=t&&t-b.observedAt<=STRESS_MODEL.freshMs).at(-1);
         const tracked=this.trackingSince.get(m.symbol)<=t-STEP;
-        const book=b?{...b,valid:true}:{valid:false};
+        const book=b?{valid:true,observedAt:b.observedAt,spreadBps:b.spreadBps,bidUsd:b.bidUsd,askUsd:b.askUsd,depthUsd:b.depthUsd,imbalance:b.imbalance}:{valid:false};
         if(!rows.length||t>rows.at(-1).t){rows.push({t,book,covered:covered&&tracked,liquidationUsd:covered&&tracked?(this.events.get(t)?.get(m.symbol)||0):null});this.histories.delete(m.symbol);this.histories.set(m.symbol,rows.filter(r=>r.t>=t-12000000).slice(-400));}
       }
     }
     this.lastClosedEnd=end;for(const t of this.events.keys())if(t<=end)this.events.delete(t);
     while(this.histories.size>24)this.histories.delete(this.histories.keys().next().value);
     for(const symbol of this.trackingSince.keys())if(!this.response.markets.some(m=>m.symbol===symbol)){this.trackingSince.delete(symbol);this.books.delete(symbol);}
-    try{this.storage?.setItem(STRESS_HISTORY_KEY,JSON.stringify([...this.histories]));}catch{this.value.historyPersistent=false;}
+    this.persist();
     this.evaluate();
   };
+  persist(){
+    if(!this.storage){this.value.historyPersistent=false;return;}
+    // Preserve at least the 259 intervals required for a full 1h calibration.
+    for(const limit of [400,260]){try{this.storage.setItem(STRESS_HISTORY_KEY,JSON.stringify([...this.histories].map(([symbol,rows])=>[symbol,rows.slice(-limit)])));this.value.historyPersistent=true;this.value.historyRetentionRows=limit;return;}catch{/* Retry only our bounded public-history payload, never delete other app data. */}}
+    this.value.historyPersistent=false;
+  }
   evaluate(){
     if(!this.response)return;this.lastEvaluation=this.clock();const now=this.clock()+this.timeOffset,stale=now-this.response.observedAt>STRESS_MODEL.freshMs;
     const markets=this.response.markets.map(m=>{
